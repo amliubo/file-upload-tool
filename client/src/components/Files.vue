@@ -14,7 +14,7 @@
       </div>
     </div>
     <hr><br>
-    <el-upload class="upload-demo" drag action="http://10.10.20.24:5001/upload" multiple :on-success="fetchServerFiles">
+    <el-upload class="upload-demo" drag action="http://10.10.234.201:5001/upload" multiple :on-success="fetchServerFiles">
       <el-icon class="el-icon--upload"><upload-filled /></el-icon>
       <div class="el-upload__text">
         将文件拖到此处，或<em>点击上传</em> <br>
@@ -51,7 +51,7 @@ export default {
     const serverFiles = ref([]);
 
     const fetchServerFiles = () => {
-      axios.get('http://10.10.20.24:5001/file_list')
+      axios.get('http://10.10.243.201:5001/file_list')
         .then(response => {
           serverFiles.value = response.data.files;
         })
@@ -70,7 +70,7 @@ export default {
     };
 
     const getDownloadLink = (file) => {
-      return `http://10.10.20.24:5001/download/${file}`;
+      return `http://10.10.20.243.201:5001/download/${file}`;
     };
 
     onMounted(() => {
