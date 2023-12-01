@@ -14,29 +14,18 @@
       </div>
     </div>
     <hr><br>
-
-    <alert :message="message" v-if="showMessage"></alert>
-    <input type="file" ref="fileInput" @change="handleFileChange" multiple />
-    <div v-if="selectedFiles && selectedFiles.length > 0">
-      <hr>
-      <h5>Selected Files:</h5>
-      <ul>
-        <li v-for="(file, index) in selectedFiles" :key="index">
-          {{ file.name }} ({{ formatBytes(file.size) }})
-        </li>
-      </ul>
-    </div>
-    <button type="button" class="btn btn-primary" @click="handleUpload"
-      :disabled="!selectedFiles || selectedFiles.length === 0">
-      Upload Files
-    </button>
+    <el-upload class="upload-demo" drag action="http://10.10.20.24:5001/upload" multiple :on-success="fetchServerFiles">
+      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+      <div class="el-upload__text">
+        将文件拖到此处，或<em>点击上传</em> <br>
+        Drop file here or <em>click to upload</em>
+      </div>
+    </el-upload>
   </div>
-
   <div class="container">
-    <br><br><br>
-    <h4 style="text-align: right">File Download</h4>
+    <br>
+    <h4 class="display-6" style="text-align: right">File Download</h4>
     <hr><br>
-
     <template v-if="serverFiles.length > 0">
       <ul>
         <li v-for="(file, index) in serverFiles" :key="index">
@@ -54,67 +43,45 @@
 
 <script>
 import axios from 'axios';
-import Alert from './Alert.vue';
+import { ref, onMounted } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default {
-  data() {
-    return {
-      serverFiles: [],
-      selectedFiles: null,
-      message: '',
-      showMessage: false,
-    };
-  },
-  components: {
-    alert: Alert,
-  },
-  mounted() {
-    this.fetchServerFiles();
-  },
-  methods: {
-    fetchServerFiles() {
-      axios.get('http://10.10.243.201:5001/file_list')
+  setup() {
+    const serverFiles = ref([]);
+
+    const fetchServerFiles = () => {
+      axios.get('http://10.10.20.24:5001/file_list')
         .then(response => {
-          this.serverFiles = response.data.files;  // Use response.data.files
+          serverFiles.value = response.data.files;
         })
         .catch(error => {
           console.error(error);
         });
-    },
-    handleFileChange(event) {
-      this.selectedFiles = event.target.files;
-    },
-    handleUpload() {
-      const formData = new FormData();
-      for (let i = 0; i < this.selectedFiles.length; i++) {
-        formData.append('file', this.selectedFiles[i]);
-      }
-      axios.post('http://10.10.243.201:5001/upload', formData)
-        .then(() => {
-          this.message = 'Files uploaded successfully!';
-          this.showMessage = true;
-          this.$nextTick(() => {
-            this.fetchServerFiles();
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          this.message = 'Error uploading files.';
-          this.showMessage = true;
-        });
-    },
-    formatBytes(bytes, decimals = 2) {
+    };
+
+    const formatBytes = (bytes, decimals = 2) => {
       if (bytes === 0) return '0 Bytes';
       const k = 1024;
       const dm = decimals < 0 ? 0 : decimals;
       const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    },
-    getDownloadLink(file) {
-      return `http://10.10.243.201:5001/download/${file}`;
-    },
+    };
+
+    const getDownloadLink = (file) => {
+      return `http://10.10.20.24:5001/download/${file}`;
+    };
+
+    onMounted(() => {
+      fetchServerFiles();
+    });
+
+    return {
+      serverFiles,
+      formatBytes,
+      getDownloadLink,
+    };
   },
 };
 </script>
@@ -133,7 +100,6 @@ export default {
 
 .logo {
   width: 240px;
-  /* Adjust the width as needed */
   height: auto;
 }
 </style>
