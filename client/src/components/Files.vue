@@ -17,7 +17,6 @@
     <el-upload class="upload-demo" drag action="http://10.10.234.201:5001/upload" multiple :on-success="fetchServerFiles">
       <el-icon class="el-icon--upload"><upload-filled /></el-icon>
       <div class="el-upload__text">
-        将文件拖到此处，或<em>点击上传</em> <br>
         Drop file here or <em>click to upload</em>
       </div>
     </el-upload>
