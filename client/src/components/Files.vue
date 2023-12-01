@@ -81,6 +81,7 @@ export default {
       serverFiles,
       formatBytes,
       getDownloadLink,
+      fetchServerFiles
     };
   },
 };
