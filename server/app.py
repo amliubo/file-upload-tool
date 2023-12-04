@@ -7,6 +7,7 @@ UPLOAD_FOLDER = 'uploads'
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['textarea_content'] = ''
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 @app.route('/file_list')
@@ -34,6 +35,17 @@ def upload_file():
 @app.route("/download/<filename>")
 def download_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
+
+@app.route('/update_textarea', methods=['POST'])
+def update_textarea():
+    content = request.json.get('content')
+    app.config['textarea_content'] = content
+    return jsonify({'status': 'success', 'message': 'Textarea content updated successfully'})
+
+@app.route('/get_textarea_content')
+def get_textarea_content():
+    content = app.config['textarea_content']
+    return jsonify({'content': content})
 
 def clear_upload_folder():
     print("Clearing UPLOAD_FOLDER")

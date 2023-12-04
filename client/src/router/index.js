@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Files from '../components/Files.vue'
+import index from '../components/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'Files',
-      component: Files,
+      name: 'index',
+      component: index,
     }
   ]
 })
