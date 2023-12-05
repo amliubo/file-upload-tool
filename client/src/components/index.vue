@@ -19,7 +19,7 @@
         </div>
       </div>
       <hr><br>
-      <el-upload class="upload-demo" drag action="http://10.10.20.24:5001/upload" multiple :on-success="fetchServerFiles">
+      <el-upload class="upload-demo" drag action="http://10.10.243.201:5001/upload" multiple :on-success="fetchServerFiles">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
           Drop file here or <em>click to upload</em>
