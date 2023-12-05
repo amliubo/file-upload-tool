@@ -112,7 +112,7 @@ export default {
     };
 
     const getDownloadLink = (file) => {
-      return `/download/${file}`;
+      return `${axios.defaults.baseURL}/download/${file}`;
     };
 
     const copyToClipboard = () => {

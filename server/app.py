@@ -34,7 +34,8 @@ def upload_file():
 
 @app.route("/download/<filename>")
 def download_file(filename):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
+    uploads_folder = os.path.join(os.getcwd(), app.config["UPLOAD_FOLDER"])
+    return send_from_directory(uploads_folder, filename, as_attachment=True)
 
 @app.route('/update_textarea', methods=['POST'])
 def update_textarea():
