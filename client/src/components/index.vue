@@ -82,9 +82,15 @@ export default {
     const serverFiles = ref([]);
     const activeIndex = ref('1');
     const textarea = ref('');
+    const isMobile = ref(false);
 
     // 后端地址
     const uploadAction = '/upload';
+
+    const checkIsMobile = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      isMobile.value = isMobileDevice;
+    };
 
     const handleSelect = (index) => {
       activeIndex.value = index.toString();
@@ -142,8 +148,21 @@ export default {
       }
     };
 
+    const showImageMessageOnRefresh = () => {
+      if (!isMobile.value) {
+        ElMessageBox({
+          message: '<img src="http://10.10.25.66/resource/erweima.png" style="max-width: 240px; width: 100%; height: auto; margin: 20px auto; display: block; object-fit: cover;">',
+          dangerouslyUseHTMLString: true,
+          showCancelButton: false,
+          showConfirmButton: false,
+        });
+      }
+    };
+
     onMounted(() => {
       fetchServerFiles();
+      checkIsMobile();
+      showImageMessageOnRefresh();
     });
 
     return {
@@ -158,6 +177,7 @@ export default {
       updateBackendTextarea,
       fetchBackendTextarea,
       uploadAction,
+      isMobile,
     };
   },
 };
