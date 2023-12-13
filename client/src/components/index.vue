@@ -14,7 +14,7 @@
               <p class="lead">This is a lightweight and fast file transfer efficiency tool with no size limit.</p>
             </div>
             <!-- Logo -->
-            <img src="@/assets/logo.png" alt="Download Icon" class="logo">
+            <img src="@/assets/logo.png" alt="Download Icon" class="logo" v-if="!isMobile">
           </div>
         </div>
       </div>
@@ -48,17 +48,17 @@
         <div class="container">
           <div class="header">
             <div>
-              <h1 class="display-4">Text Transfer Tool</h1>
+              <h1 class="display-4">Copy Paste Tool</h1>
               <p class="lead">This is a lightweight and convenient text transmission efficiency tool with no word limit.
               </p>
             </div>
             <!-- Logo -->
-            <img src="@/assets/logo.png" alt="Download Icon" class="logo">
+            <img src="@/assets/logo.png" alt="Download Icon" class="logo" v-if="!isMobile">
           </div>
         </div>
       </div>
       <hr><br>
-      <el-input v-model="textarea" :autosize="{ minRows: 12, maxRows: 24 }" type="textarea" placeholder="Please input..."
+      <el-input v-model="textarea" :autosize="{ minRows: 12, maxRows: 22 }" type="textarea" placeholder="Please input..."
         @input="updateBackendTextarea" />
       <br><br>
       <el-button @click="copyToClipboard" type="primary">
