@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-      <el-menu-item index="1" style="font-size: 18px;">文件传输</el-menu-item>
-      <el-badge value="hot" class="item"><el-menu-item index="2" style="font-size: 18px;">文本传输</el-menu-item></el-badge>
+      <el-menu-item index="1" style="font-size: 17px;">文件传输</el-menu-item>
+      <el-badge value="hot" class="item"><el-menu-item index="2" style="font-size: 17px;">文本传输</el-menu-item></el-badge>
     </el-menu>
     <br>
     <div v-if="activeIndex === '1'">
@@ -182,7 +182,7 @@ export default {
 }
 
 .erweima {
-  width: 240px;
+  width: 230px;
   height: auto;
 }
 </style>
