@@ -2,7 +2,7 @@
   <div class="container">
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1" style="font-size: 16px;">文件传输</el-menu-item>
-      <el-menu-item index="2" style="font-size: 16px;">文本传输</el-menu-item>
+      <el-badge value="hot" class="item"><el-menu-item index="2" style="font-size: 16px;">文本传输</el-menu-item></el-badge>
     </el-menu>
     <br>
     <div v-if="activeIndex === '1'">
@@ -13,8 +13,7 @@
               <h1 class="display-4">Upload Tool</h1>
               <p class="lead">This is a lightweight and fast file transfer efficiency tool with no size limit.</p>
             </div>
-            <!-- Logo -->
-            <img src="@/assets/logo.png" alt="Download Icon" class="logo" v-if="!isMobile">
+            <img src="http://10.10.25.66/resource/erweima.png" class="erweima" v-if="!isMobile">
           </div>
         </div>
       </div>
@@ -52,8 +51,7 @@
               <p class="lead">This is a lightweight and convenient text transmission efficiency tool with no word limit.
               </p>
             </div>
-            <!-- Logo -->
-            <img src="@/assets/logo.png" alt="Download Icon" class="logo" v-if="!isMobile">
+            <img src="http://10.10.25.66/resource/erweima.png" class="erweima" v-if="!isMobile">
           </div>
         </div>
       </div>
@@ -148,21 +146,9 @@ export default {
       }
     };
 
-    const showImageMessageOnRefresh = () => {
-      if (!isMobile.value) {
-        ElMessageBox({
-          message: '<img src="http://10.10.25.66/resource/erweima.png" style="max-width: 240px; width: 100%; height: auto; margin: 20px auto; display: block; object-fit: cover;">',
-          dangerouslyUseHTMLString: true,
-          showCancelButton: false,
-          showConfirmButton: false,
-        });
-      }
-    };
-
     onMounted(() => {
       fetchServerFiles();
       checkIsMobile();
-      showImageMessageOnRefresh();
     });
 
     return {
@@ -195,8 +181,8 @@ export default {
   align-items: center;
 }
 
-.logo {
-  width: 280px;
+.erweima {
+  width: 230px;
   height: auto;
 }
 </style>
