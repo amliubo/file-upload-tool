@@ -56,7 +56,7 @@
         </div>
       </div>
       <hr><br>
-      <el-input v-model="textarea" :autosize="{ minRows: 12, maxRows: 22 }" type="textarea" placeholder="Please input..."
+      <el-input v-model="textarea" :autosize="{ minRows: 12, maxRows: 20 }" type="textarea" placeholder="Please input..."
         @input="updateBackendTextarea" />
       <br><br>
       <el-button @click="copyToClipboard" type="primary">
