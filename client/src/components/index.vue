@@ -56,12 +56,11 @@
         </div>
       </div>
       <hr><br>
-      <el-input v-model="textarea" :autosize="{ minRows: 17, maxRows: 17 }" type="textarea" placeholder="Please input..."
+      <el-input v-model="textarea" :autosize="{ minRows: 10, maxRows: 18 }" type="textarea" placeholder="Please input..."
         @input="updateBackendTextarea" />
       <br><br>
       <el-button @click="copyToClipboard" type="primary">
-        <el-icon><document-copy /></el-icon>
-        Copy to Clipboard
+        <el-icon><document-copy /></el-icon> Copy
       </el-button>
     </div>
   </div>
@@ -126,7 +125,7 @@ export default {
       input.select();
       document.execCommand('copy');
       document.body.removeChild(input);
-      ElMessage.success('Text successfully copied to clipboard');
+      ElMessage.success('文本已复制到剪贴板');
     };
 
     const updateBackendTextarea = async () => {
