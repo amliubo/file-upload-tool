@@ -1,11 +1,23 @@
 <template>
   <div class="container">
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-      <el-menu-item index="1" style="font-size: 16px;">文件传输</el-menu-item>
-      <el-badge value="hot" class="item"><el-menu-item index="2" style="font-size: 16px;">文本传输</el-menu-item></el-badge>
+      <el-sub-menu index="1">
+        <template #title>
+          <span style="font-size: 16px;"><el-icon>
+              <Folder />
+            </el-icon>文件传输</span>
+        </template>
+        <el-menu-item index="1-1" style="font-size: 15px;">组件方式</el-menu-item>
+        <el-menu-item index="1-2" style="font-size: 15px;">非组件方式</el-menu-item>
+      </el-sub-menu>
+      <el-menu-item index="2" style="font-size: 16px;">
+        <el-badge value="hot" class="item"><el-icon>
+            <Tickets />
+          </el-icon>文本传输</el-badge>
+      </el-menu-item>
     </el-menu>
     <br>
-    <div v-if="activeIndex === '1'">
+    <div v-show="activeIndex === '1-1'">
       <div class="jumbotron jumbotron-fluid">
         <div class="container">
           <div class="header">
@@ -42,7 +54,53 @@
         </template>
       </div>
     </div>
-    <div v-else-if="activeIndex === '2'">
+    <div v-show="activeIndex === '1-2'">
+      <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <div class="header">
+            <div>
+              <h1 class="display-4">Upload Tool</h1>
+              <p class="lead">This is a lightweight and fast file transfer efficiency tool with no size limit.</p>
+            </div>
+            <img src="http://10.10.25.66/resource/erweima.png" class="erweima" v-if="!isMobile">
+          </div>
+        </div>
+      </div>
+      <hr><br>
+      <input type="file" ref="fileInput" @change="handleFileChange" multiple />
+      <div v-if="selectedFiles && selectedFiles.length > 0">
+        <hr>
+        <h5>Selected Files:</h5>
+        <ul>
+          <li v-for="(file, index) in selectedFiles" :key="index">
+            {{ file.name }} ({{ formatBytes(file.size) }})
+          </li>
+        </ul>
+      </div>
+      <button type="button" class="btn btn-primary" @click="handleUpload"
+        :disabled="!selectedFiles || selectedFiles.length === 0 || uploading">
+        <span v-if="!uploading">Upload Files</span>
+        <span v-else>Loading...</span>
+      </button>
+      <div class="container">
+        <br>
+        <h4 class="display-7" style="text-align: right">File Download</h4>
+        <hr><br>
+        <template v-if="serverFiles.length > 0">
+          <ul>
+            <li v-for="(file, index) in serverFiles" :key="index">
+              <a :href="getDownloadLink(file.name)" :download="file.name" viewer>
+                {{ file.name }} ({{ formatBytes(file.size) }})
+              </a>
+            </li>
+          </ul>
+        </template>
+        <template v-else>
+          <p>当前没有可供下载的文件。</p>
+        </template>
+      </div>
+    </div>
+    <div v-show="activeIndex === '2'">
       <div class="jumbotron jumbotron-fluid">
         <div class="container">
           <div class="header">
@@ -62,6 +120,9 @@
       <el-button @click="copyToClipboard" type="primary">
         <el-icon><document-copy /></el-icon> Copy
       </el-button>
+      <el-button @click="clearTextarea" type="danger"><el-icon>
+          <Delete />
+        </el-icon>Clear</el-button>
     </div>
   </div>
 </template>
@@ -77,9 +138,11 @@ axios.defaults.baseURL = 'http://10.10.243.201:5001';
 export default {
   setup() {
     const serverFiles = ref([]);
-    const activeIndex = ref('1');
+    const selectedFiles = ref([]);
+    const activeIndex = ref('1-1');
     const textarea = ref('');
     const isMobile = ref(false);
+    const uploading = ref(false);
 
     // 后端地址
     const uploadAction = '/upload';
@@ -118,6 +181,28 @@ export default {
       return `${axios.defaults.baseURL}/download/${file}`;
     };
 
+    const handleFileChange = (event) => {
+      selectedFiles.value = event.target.files;
+    };
+
+    const handleUpload = () => {
+      uploading.value = true;
+      const formData = new FormData();
+      for (let i = 0; i < selectedFiles.value.length; i++) {
+        formData.append('file', selectedFiles.value[i]);
+      }
+      axios.post('/upload', formData)
+        .then(() => {
+          uploading.value = false;
+          fetchServerFiles();
+        })
+        .catch((error) => {
+          uploading.value = false;
+          ElMessage.error('上传文件时发生错误')
+          console.error('上传文件时发生错误：', error);
+        })
+    };
+
     const copyToClipboard = () => {
       const input = document.createElement('input');
       input.value = textarea.value;
@@ -126,6 +211,10 @@ export default {
       document.execCommand('copy');
       document.body.removeChild(input);
       ElMessage.success('文本已复制到剪贴板');
+    };
+
+    const clearTextarea = () => {
+      textarea.value = '';
     };
 
     const updateBackendTextarea = async () => {
@@ -163,6 +252,11 @@ export default {
       fetchBackendTextarea,
       uploadAction,
       isMobile,
+      handleFileChange,
+      selectedFiles,
+      uploading,
+      handleUpload,
+      clearTextarea,
     };
   },
 };
