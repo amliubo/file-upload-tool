@@ -24,24 +24,31 @@
         <div class="container">
           <div class="header">
             <div>
-              <h1 class="display-4">Upload Tool</h1>
-              <p class="lead">This is a lightweight and fast file transfer efficiency tool with no size limit.</p>
+              <el-divider content-position="left">
+                <el-tag class="mx-1" type="success" round>
+                  <h1 class="display-4">Upload Tool</h1>
+                </el-tag>
+              </el-divider>
+              <br>
+              <p class="lead">这是一个轻量级、安全的文件传输效率工具，支持通过组件方式或非组件方式上传文件，提供实时文件列表和下载功能。</p>
             </div>
             <img src="http://10.10.25.66/resource/erweima.png" class="erweima" v-if="!isMobile">
           </div>
         </div>
       </div>
-      <hr><br>
-      <el-upload class="upload-demo" drag action="http://10.10.243.201:5001/upload" multiple :on-success="fetchServerFiles">
+      <el-upload class="upload-demo" drag action="http://10.10.20.24:5001/upload" multiple :on-success="fetchServerFiles">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
-          Drop file here or <em>click to upload</em>
+          将文件拖放到此处或<em>单击上传</em>
         </div>
       </el-upload>
+      <br>
       <div class="container">
-        <br>
-        <h4 class="display-7" style="text-align: right">File Download</h4>
-        <hr><br>
+        <el-divider content-position="right">
+          <el-tag class="mx-1" type="warning" round>
+            <h4 class="display-6" style="text-align: right">File Download</h4>
+          </el-tag>
+        </el-divider>
         <template v-if="serverFiles.length > 0">
           <ul>
             <li v-for="(file, index) in serverFiles" :key="index">
@@ -52,7 +59,7 @@
           </ul>
         </template>
         <template v-else>
-          <p>当前没有可供下载的文件。</p>
+          <p class="lead">当前没有可供下载的文件。</p>
         </template>
       </div>
     </div>
@@ -61,14 +68,18 @@
         <div class="container">
           <div class="header">
             <div>
-              <h1 class="display-4">Upload Tool</h1>
-              <p class="lead">This is a lightweight and fast file transfer efficiency tool with no size limit.</p>
+              <el-divider content-position="left">
+                <el-tag class="mx-1" type="success" round>
+                  <h1 class="display-4">Upload Tool</h1>
+                </el-tag>
+              </el-divider>
+              <br>
+              <p class="lead">这是一个轻量级、安全的文件传输效率工具，支持通过组件方式或非组件方式上传文件，提供实时文件列表和下载功能。</p>
             </div>
             <img src="http://10.10.25.66/resource/erweima.png" class="erweima" v-if="!isMobile">
           </div>
         </div>
       </div>
-      <hr><br>
       <input type="file" ref="fileInput" @change="handleFileChange" multiple />
       <div v-if="selectedFiles && selectedFiles.length > 0">
         <hr>
@@ -85,9 +96,12 @@
         <span v-else>Loading...</span>
       </button>
       <div class="container">
-        <br>
-        <h4 class="display-7" style="text-align: right">File Download</h4>
-        <hr><br>
+        <br><br><br>
+        <el-divider content-position="right">
+          <el-tag class="mx-1" type="warning" round>
+            <h4 class="display-6" style="text-align: right">File Download</h4>
+          </el-tag>
+        </el-divider>
         <template v-if="serverFiles.length > 0">
           <ul>
             <li v-for="(file, index) in serverFiles" :key="index">
@@ -98,7 +112,7 @@
           </ul>
         </template>
         <template v-else>
-          <p>当前没有可供下载的文件。</p>
+          <p class="lead">当前没有可供下载的文件。</p>
         </template>
       </div>
     </div>
@@ -107,24 +121,27 @@
         <div class="container">
           <div class="header">
             <div>
-              <h1 class="display-4">Copy Paste Tool</h1>
-              <p class="lead">This is a lightweight and convenient text transmission efficiency tool with no word limit.
-              </p>
+              <el-divider content-position="left">
+                <el-tag class="mx-1" type="warning" round>
+                  <h1 class="display-4">Copy Paste Tool</h1>
+                </el-tag>
+              </el-divider>
+              <br>
+              <p class="lead">这是一个方便快捷的文本传输效率工具，无字数限制，支持复制粘贴文本内容并实时同步，提供清空功能和复制到剪贴板。</p>
             </div>
             <img src="http://10.10.25.66/resource/erweima.png" class="erweima" v-if="!isMobile">
           </div>
         </div>
       </div>
-      <hr><br>
-      <el-input v-model="textarea" :autosize="{ minRows: 10, maxRows: 18 }" type="textarea" placeholder="Please input..."
+      <el-input v-model="textarea" :autosize="{ minRows: 10, maxRows: 18 }" type="textarea" placeholder="点击输入..."
         @input="updateBackendTextarea" />
       <br><br>
       <el-button @click="copyToClipboard" type="primary">
-        <el-icon><document-copy /></el-icon> Copy
+        <el-icon><document-copy /></el-icon> 复制粘贴板
       </el-button>
       <el-button @click="clearTextarea" type="danger"><el-icon>
           <Delete />
-        </el-icon>Clear</el-button>
+        </el-icon>清空输入框</el-button>
     </div>
   </div>
 </template>
@@ -212,13 +229,13 @@ export default {
       input.select();
       document.execCommand('copy');
       document.body.removeChild(input);
-      ElMessage.success('文本已复制剪贴板!');
+      ElMessage.success('Copied successfully!');
     };
 
     const clearTextarea = async () => {
       textarea.value = '';
       updateBackendTextarea()
-      ElMessage.success('文本框已清空!');
+      ElMessage.success('Cleared successfully!');
     };
 
     const updateBackendTextarea = async () => {
@@ -279,7 +296,7 @@ export default {
 }
 
 .erweima {
-  width: 180px;
+  width: 220px;
   height: auto;
 }
 </style>
