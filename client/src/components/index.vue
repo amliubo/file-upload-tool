@@ -36,7 +36,7 @@
           </div>
         </div>
       </div>
-      <el-upload class="upload-demo" drag action="http://10.10.20.24:5001/upload" multiple :on-success="fetchServerFiles">
+      <el-upload class="upload-demo" drag action="http://10.10.243.201:5001/upload" multiple :on-success="fetchServerFiles">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
           将文件拖放到此处或<em>单击上传</em>
