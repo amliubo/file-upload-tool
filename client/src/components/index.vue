@@ -7,7 +7,9 @@
               <Folder />
             </el-icon>文件传输</span>
         </template>
-        <el-menu-item index="1-1" style="font-size: 15px;">组件方式</el-menu-item>
+        <el-menu-item index="1-1" style="font-size: 15px;"><el-icon>
+            <ElementPlus />
+          </el-icon>组件方式</el-menu-item>
         <el-menu-item index="1-2" style="font-size: 15px;">非组件方式</el-menu-item>
       </el-sub-menu>
       <el-menu-item index="2" style="font-size: 16px;">
@@ -210,11 +212,13 @@ export default {
       input.select();
       document.execCommand('copy');
       document.body.removeChild(input);
-      ElMessage.success('文本已复制到剪贴板');
+      ElMessage.success('文本已复制剪贴板!');
     };
 
-    const clearTextarea = () => {
+    const clearTextarea = async () => {
       textarea.value = '';
+      updateBackendTextarea()
+      ElMessage.success('文本框已清空!');
     };
 
     const updateBackendTextarea = async () => {
