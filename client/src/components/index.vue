@@ -3,9 +3,11 @@
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-sub-menu index="1">
         <template #title>
-          <span style="font-size: 16px;"><el-icon>
-              <Folder />
-            </el-icon>文件传输</span>
+          <el-badge :value="filesBadgeValue" class="item" type="success">
+            <span style="font-size: 16px;"><el-icon>
+                <Folder />
+              </el-icon>文件传输</span>
+          </el-badge>
         </template>
         <el-menu-item index="1-1" style="font-size: 15px;"><el-icon>
             <ElementPlus />
@@ -162,6 +164,7 @@ export default {
     const textarea = ref('');
     const isMobile = ref(false);
     const uploading = ref(false);
+    const filesBadgeValue = ref('')
 
     // 后端地址
     const uploadAction = '/upload';
@@ -182,6 +185,7 @@ export default {
       try {
         const response = await axios.get('/file_list');
         serverFiles.value = response.data.files;
+        filesBadgeValue.value = response.data.files.length;
       } catch (error) {
         console.error('Error fetching server files:', error);
       }
@@ -278,6 +282,7 @@ export default {
       uploading,
       handleUpload,
       clearTextarea,
+      filesBadgeValue,
     };
   },
 };
