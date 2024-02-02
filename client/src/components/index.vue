@@ -3,11 +3,18 @@
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-sub-menu index="1">
         <template #title>
-          <el-badge :value="filesBadgeValue" class="item" type="success">
+          <div v-if="filesBadgeValue > 0">
+            <el-badge :value="filesBadgeValue" class="item" type="success">
+              <span style="font-size: 16px;"><el-icon>
+                  <Folder />
+                </el-icon>文件传输</span>
+            </el-badge>
+          </div>
+          <div v-else>
             <span style="font-size: 16px;"><el-icon>
                 <Folder />
               </el-icon>文件传输</span>
-          </el-badge>
+          </div>
         </template>
         <el-menu-item index="1-1" style="font-size: 15px;"><el-icon>
             <ElementPlus />
@@ -55,7 +62,7 @@
           <ul>
             <li v-for="(file, index) in serverFiles" :key="index">
               <a :href="getDownloadLink(file.name)" :download="file.name" viewer>
-                {{ file.name }} ({{ formatBytes(file.size) }})
+                <span style="font-size: 18px;">{{ file.name }} ({{ formatBytes(file.size) }})</span>
               </a>
             </li>
           </ul>
@@ -87,7 +94,7 @@
         <hr>
         <h5>Selected Files:</h5>
         <ul>
-          <li v-for="(file, index) in selectedFiles" :key="index">
+          <li v-for="( file, index ) in  selectedFiles " :key="index">
             {{ file.name }} ({{ formatBytes(file.size) }})
           </li>
         </ul>
@@ -106,7 +113,7 @@
         </el-divider>
         <template v-if="serverFiles.length > 0">
           <ul>
-            <li v-for="(file, index) in serverFiles" :key="index">
+            <li v-for="( file, index ) in  serverFiles " :key="index">
               <a :href="getDownloadLink(file.name)" :download="file.name" viewer>
                 {{ file.name }} ({{ formatBytes(file.size) }})
               </a>
