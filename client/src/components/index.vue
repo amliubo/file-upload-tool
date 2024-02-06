@@ -7,13 +7,13 @@
             <el-badge :value="filesBadgeValue" class="item" type="success">
               <span style="font-size: 16px;"><el-icon>
                   <Folder />
-                </el-icon>文件传输</span>
+                </el-icon>文件</span>
             </el-badge>
           </div>
           <div v-else>
             <span style="font-size: 16px;"><el-icon>
                 <Folder />
-              </el-icon>文件传输</span>
+              </el-icon>文件</span>
           </div>
         </template>
         <el-menu-item index="1-1" style="font-size: 15px;"><el-icon>
@@ -24,7 +24,7 @@
       <el-menu-item index="2" style="font-size: 16px;">
         <el-badge value="hot" class="item"><el-icon>
             <Tickets />
-          </el-icon>文本传输</el-badge>
+          </el-icon>文本</el-badge>
       </el-menu-item>
     </el-menu>
     <br>
