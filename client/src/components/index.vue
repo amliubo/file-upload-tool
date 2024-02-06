@@ -61,9 +61,17 @@
         <template v-if="serverFiles.length > 0">
           <ul>
             <li v-for="(file, index) in serverFiles" :key="index">
-              <a :href="getDownloadLink(file.name)" :download="file.name" viewer>
-                <span style="font-size: 18px;">{{ file.name }} ({{ formatBytes(file.size) }})</span>
-              </a>
+              <div style="display: flex; align-items: center;">
+                <div style="flex: 100%;">
+                  <a :href="getDownloadLink(file.name)" :download="file.name" viewer>
+                    <span style="font-size: 18px;">{{ file.name }} ({{ formatBytes(file.size) }})</span>
+                  </a>
+                </div>
+                <div style="flex: 38%;">
+                  <el-progress status="error" striped striped-flow :stroke-width="1"
+                    :percentage="calculateProgress(file.remainingTime)" color="red" />
+                </div>
+              </div>
             </li>
           </ul>
         </template>
@@ -207,6 +215,22 @@ export default {
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     };
 
+    const updateRemainingTime = () => {
+      setInterval(() => {
+        serverFiles.value.forEach(file => {
+          if (file.remainingTime > 0) {
+            file.remainingTime -= 1;
+          }
+        });
+      }, 1000);
+    };
+
+    const calculateProgress = (remainingTime) => {
+      const totalSeconds = 5940;
+      const progress = ((totalSeconds - remainingTime) / totalSeconds) * 100;
+      return progress;
+    };
+
     const getDownloadLink = (file) => {
       return `${axios.defaults.baseURL}/download/${file}`;
     };
@@ -269,6 +293,7 @@ export default {
     onMounted(() => {
       fetchServerFiles();
       checkIsMobile();
+      updateRemainingTime();
     });
 
     return {
@@ -290,6 +315,7 @@ export default {
       handleUpload,
       clearTextarea,
       filesBadgeValue,
+      calculateProgress
     };
   },
 };

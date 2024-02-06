@@ -31,6 +31,7 @@ def get_file_list():
                     file_info = {
                         "name": file,
                         "size": file_size,
+                        "remainingTime": remaining_time,
                     }
                     file_list.append(file_info)
                 else:
