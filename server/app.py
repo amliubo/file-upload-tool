@@ -74,7 +74,7 @@ def update_textarea():
     content = request.json.get("content")
     app.config["textarea_content"] = content
     return jsonify(
-        {"status": "success", "message": "Textarea content updated successfully"}
+        {"status": "success"}
     )
 
 

@@ -68,7 +68,7 @@
                   </a>
                 </div>
                 <div style="flex: 38%;">
-                  <el-progress status="error" striped striped-flow :stroke-width="1"
+                  <el-progress status="exception" striped striped-flow :stroke-width="1"
                     :percentage="calculateProgress(file.remainingTime)" color="red" />
                 </div>
               </div>
@@ -102,7 +102,7 @@
         <hr>
         <h5>Selected Files:</h5>
         <ul>
-          <li v-for="( file, index ) in  selectedFiles " :key="index">
+          <li v-for="( file, index ) in selectedFiles " :key="index">
             {{ file.name }} ({{ formatBytes(file.size) }})
           </li>
         </ul>
@@ -121,7 +121,7 @@
         </el-divider>
         <template v-if="serverFiles.length > 0">
           <ul>
-            <li v-for="( file, index ) in  serverFiles " :key="index">
+            <li v-for="( file, index ) in serverFiles " :key="index">
               <a :href="getDownloadLink(file.name)" :download="file.name" viewer>
                 {{ file.name }} ({{ formatBytes(file.size) }})
               </a>
@@ -197,13 +197,9 @@ export default {
     };
 
     const fetchServerFiles = async () => {
-      try {
-        const response = await axios.get('/file_list');
-        serverFiles.value = response.data.files;
-        filesBadgeValue.value = response.data.files.length;
-      } catch (error) {
-        console.error('Error fetching server files:', error);
-      }
+      const response = await axios.get('/file_list');
+      serverFiles.value = response.data.files;
+      filesBadgeValue.value = response.data.files.length;
     };
 
     const formatBytes = (bytes, decimals = 2) => {
