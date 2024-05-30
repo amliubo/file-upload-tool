@@ -4,21 +4,21 @@
       <el-descriptions style="width: auto" border>
         <el-descriptions-item>
           <template #label>
-            <span style="font-family: 'Comic Sans MS'; font-size: 15px;">
+            <span style="font-family: 'Comic Sans MS, cursive'; font-size: 15px;">
               已处理文件:
             </span>
           </template>
-          <span :style="{ fontSize: '22px', color: '#42b983', }">
+          <span :style="{ fontSize: '20px', color: '#28a745', fontFamily: 'Comic Sans MS, cursive' }">
             {{ fileServiceCount }}
           </span>
         </el-descriptions-item>
         <el-descriptions-item>
           <template #label>
-            <span style="font-family: 'Comic Sans MS'; font-size: 15px;">
+            <span style="font-family: 'Comic Sans MS, cursive'; font-size: 15px;">
               已处理文本:
             </span>
           </template>
-          <span :style="{ fontSize: '22px', color: '#42b983', }">
+          <span :style="{ fontSize: '20px', color: '#28a745', fontFamily: 'Comic Sans MS, cursive' }">
             {{ textServiceCount }}
           </span>
         </el-descriptions-item>
