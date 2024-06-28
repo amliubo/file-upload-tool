@@ -1,24 +1,24 @@
 <template>
   <div class="container">
-    <div style="flex-grow: 1; display: flex; justify-content: flex-end;">
+    <div style="flex-grow: 1; display: flex; justify-content: flex-end;" v-if="!isMobile">
       <el-descriptions style="width: auto" border>
         <el-descriptions-item>
           <template #label>
-            <span style="font-family: 'Comic Sans MS, cursive'; font-size: 15px;">
+            <span style="font-size: 15px;">
               已处理文件:
             </span>
           </template>
-          <span :style="{ fontSize: '20px', color: '#28a745', fontFamily: 'Comic Sans MS, cursive' }">
+          <span :style="{ fontSize: '20px' }">
             {{ fileServiceCount }}
           </span>
         </el-descriptions-item>
         <el-descriptions-item>
           <template #label>
-            <span style="font-family: 'Comic Sans MS, cursive'; font-size: 15px;">
+            <span style="font-size: 15px;">
               已处理文本:
             </span>
           </template>
-          <span :style="{ fontSize: '20px', color: '#28a745', fontFamily: 'Comic Sans MS, cursive' }">
+          <span :style="{ fontSize: '20px' }">
             {{ textServiceCount }}
           </span>
         </el-descriptions-item>
@@ -55,28 +55,27 @@
     </el-menu>
     <br>
     <div v-show="activeIndex === '1-1'">
-      <div class="container" style="display: flex;">
-        <div style="width: 100%; display: flex; flex-direction: column;">
+      <div class="container" :style="{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }">
+        <div style="width: 100%;">
           <el-divider content-position="left">
             <el-tag class="mx-1" type="success" round>
               <h1 class="display-4">Upload Tool</h1>
             </el-tag>
           </el-divider>
           <br>
-          <div class="mx-2">
-            <el-carousel height="100px" direction="vertical" :autoplay="true">
-              <el-carousel-item v-for="f_item in file_help" :key="f_item">
-                <h3 :class="'lead'">{{ f_item }}</h3>
-              </el-carousel-item>
-            </el-carousel>
+          <div class="mx-2" v-if="!isMobile">
+            <h3 :class="'lead'">📑🔗你可以轻松地将文件上传到我们的服务器，并通过简单的点击下载你需要的文件。</h3>
+            <h3 :class="'lead'">⏳📊实时显示你上传文件的处理状态，包括剩余时间和处理进度，让你清楚地了解文件处理的情况。</h3>
+            <h3 :class="'lead'">📱💻页面可以适应不同大小的设备，让你在任何设备上都能方便地使用文件共享功能。</h3>
           </div>
         </div>
-        <div style="width: 20%; display: flex; justify-content: flex-end; align-items: center;">
-          <img src="http://10.10.25.66/resource/erweima.png" class="erweima" v-if="!isMobile" style="height: 100%;">
+
+        <div v-if="!isMobile" style="width: 20%; display: flex; justify-content: flex-end; align-items: center;">
+          <img src="http://10.10.25.66/resource/erweima.png" class="erweima" style="height: 100%;">
         </div>
       </div>
-      <el-upload class="upload-demo" drag action="http://10.10.243.201:5001/upload" multiple
-        :on-success="fetchServerFiles">
+
+      <el-upload class="upload-demo" drag :action="uploadAction" multiple @on-success="fetchServerFiles">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
           将文件拖放到此处或<em>单击上传</em>
@@ -95,10 +94,15 @@
               <div style="display: flex; align-items: center;">
                 <div style="flex: 100%;">
                   <a href="#" @click.prevent="handleFileDownload(file.name)">
-                    <span style="font-size: 18px;">{{ file.name }} ({{ formatBytes(file.size) }})</span>
+                    <div class="file-info-container">
+                      <span style="font-size: 17px; word-break: break-word;"
+                        :style="{ fontSize: isMobile ? '17px' : 'inherit' }">
+                        {{ file.name }} ({{ formatBytes(file.size) }})
+                      </span>
+                    </div>
                   </a>
                 </div>
-                <div style="flex: 38%;">
+                <div style="flex: 38%;" v-if="!isMobile">
                   <el-progress status="exception" striped striped-flow :stroke-width="1"
                     :percentage="calculateProgress(file.remainingTime)" color="red" />
                 </div>
@@ -120,12 +124,10 @@
             </el-tag>
           </el-divider>
           <br>
-          <div class="mx-2">
-            <el-carousel height="100px" direction="vertical" :autoplay="true">
-              <el-carousel-item v-for="item in file_help" :key="item">
-                <h3 :class="'lead'">{{ item }}</h3>
-              </el-carousel-item>
-            </el-carousel>
+          <div class="mx-2" v-if="!isMobile">
+            <h3 :class="'lead'">📑🔗你可以轻松地将文件上传到我们的服务器，并通过简单的点击下载你需要的文件。</h3>
+            <h3 :class="'lead'">⏳📊实时显示你上传文件的处理状态，包括剩余时间和处理进度，让你清楚地了解文件处理的情况。</h3>
+            <h3 :class="'lead'">📱💻页面可以适应不同大小的设备，让你在任何设备上都能方便地使用文件共享功能。</h3>
           </div>
         </div>
         <div style="width: 20%; display: flex; justify-content: flex-end; align-items: center;">
@@ -142,15 +144,22 @@
           </li>
         </ul>
       </div>
-      <button type="button" class="btn btn-primary" @click="handleUpload"
+      <p />
+      <button type="button" class="btn btn-primary upload-button" @click="handleUpload"
         :disabled="!selectedFiles || selectedFiles.length === 0 || uploading">
-        <span v-if="!uploading"><el-icon>
+        <span v-if="!uploading">
+          <el-icon>
             <Upload />
-          </el-icon>&nbsp;Upload</span>
-        <span v-else>Loading...</span>
+          </el-icon>
+          Upload
+        </span>
+        <span v-else>
+          <i class="loading-icon el-icon-loading"></i>
+          Loading...
+        </span>
       </button>
       <div class="container">
-        <br><br><br>
+        <br>
         <el-divider content-position="right">
           <el-tag class="mx-1" type="warning" round>
             <h4 class="display-6" style="text-align: right">File Download</h4>
@@ -158,9 +167,11 @@
         </el-divider>
         <template v-if="serverFiles.length > 0">
           <ul>
-            <li v-for="( file, index ) in serverFiles " :key="index">
+            <li v-for="(file, index) in serverFiles" :key="index" style="width: 100%; word-wrap: break-word;">
               <a :href="getDownloadLink(file.name)" :download="file.name" viewer>
-                {{ file.name }} ({{ formatBytes(file.size) }})
+                <span :style="{ fontSize: isMobile ? '17px' : 'inherit' }">
+                  {{ file.name }} ({{ formatBytes(file.size) }})
+                </span>
               </a>
             </li>
           </ul>
@@ -180,12 +191,10 @@
             </el-tag>
           </el-divider>
           <br>
-          <div class="mx-2">
-            <el-carousel height="100px" direction="vertical" :autoplay="true">
-              <el-carousel-item v-for="t_item in text_help" :key="t_item">
-                <h3 :class="'lead'">{{ t_item }}</h3>
-              </el-carousel-item>
-            </el-carousel>
+          <div class="mx-2" v-if="!isMobile">
+            <h3 :class="'lead'">✍️📝你可以在文本框中轻松地输入你想要传输的文本内容，界面简洁清晰，操作方便。</h3>
+            <h3 :class="'lead'">📋✂️提供了一键复制文本内容到剪贴板的功能，让你可以轻松复制所需文本，提高了使用效率。</h3>
+            <h3 :class="'lead'">🔄📑实时显示文本传输服务的处理次数和最新的文本内容，让你随时了解当前传输状态。</h3>
           </div>
         </div>
         <div style="width: 20%; display: flex; justify-content: flex-end; align-items: center;">
@@ -225,14 +234,27 @@ export default {
     const fileServiceCount = ref(0);
     const textServiceCount = ref(0);
 
-    const file_help = ref(['📣上传和下载文件：您可以轻松地将文件上传到我们的服务器，并通过简单的点击下载您需要的文件。📂🔗 Upload and download files: You can easily upload files to our server and download the files you need with simple clicks.',
-      '📣实时处理状态：实时显示您上传文件的处理状态，包括剩余时间和处理进度，让您清楚地了解文件处理的情况。⏳📊 Real-time processing status: Display the processing status of your uploaded files in real time, including the remaining time and processing progress, so that you can clearly understand the status of file processing.',
-      '📣适应不同设备：页面可以适应不同大小的设备，让您在任何设备上都能方便地使用文件共享功能。📱💻 Adapt to different devices: The page can adapt to devices of different sizes, allowing you to conveniently use the file sharing function on any device.']);
-    const text_help = ref(['📣简单的文本输入：您可以在文本框中轻松地输入您想要传输的文本内容，界面简洁清晰，操作方便。✍️📝 Simple text input: You can easily enter the text content you want to transfer in the text box. The interface is simple and clear, and the operation is easy.',
-      '📣快速复制粘贴：提供了一键复制文本内容到剪贴板的功能，让您可以轻松复制所需文本，提高了使用效率。📋✂️ Quick copy and paste: provides a one-click function to copy text content to the clipboard, allowing you to easily copy the required text and improve usage efficiency.',
-      '📣实时同步文本：实时显示文本传输服务的处理次数和最新的文本内容，让您随时了解当前传输状态。🔄📑 Real-time synchronization text: Displays the processing times of the text transmission service and the latest text content in real time, allowing you to understand the current transmission status at any time.']);
+    const file_help = ref([
+      '📂🔗你可以轻松地将文件上传到我们的服务器，并通过简单的点击下载你需要的文件。',
+      '⏳📊实时显示你上传文件的处理状态，包括剩余时间和处理进度，让你清楚地了解文件处理的情况。',
+      '📱💻页面可以适应不同大小的设备，让你在任何设备上都能方便地使用文件共享功能。']);
+    const text_help = ref([
+      '✍️📝你可以在文本框中轻松地输入你想要传输的文本内容，界面简洁清晰，操作方便。',
+      '📋✂️提供了一键复制文本内容到剪贴板的功能，让你可以轻松复制所需文本，提高了使用效率。',
+      '🔄📑实时显示文本传输服务的处理次数和最新的文本内容，让你随时了解当前传输状态。']);
+
+    const detectSafariVersion = () => {
+      const userAgent = navigator.userAgent;
+      const safariVersionMatch = userAgent.match(/Version\/(\d+)/);
+      if (safariVersionMatch) {
+        const version = parseInt(safariVersionMatch[1], 10);
+        return version;
+      }
+      return null;
+    };
+
     // 后端地址
-    const uploadAction = '/upload';
+    const uploadAction = 'http://10.10.243.201:5001/upload';
 
     const checkIsMobile = () => {
       const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -355,6 +377,12 @@ export default {
     };
 
     onMounted(() => {
+      const safariVersion = detectSafariVersion();
+      if (safariVersion !== null && safariVersion < 14) {
+        activeIndex.value = '1-2';
+      } else {
+        activeIndex.value = '1-1';
+      }
       fetchServerFiles();
       checkIsMobile();
       updateRemainingTime();
