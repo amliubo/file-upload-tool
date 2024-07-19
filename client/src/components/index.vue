@@ -123,7 +123,7 @@
               <h1 class="display-4">Upload Tool</h1>
             </el-tag>
           </el-divider>
-          <br>
+          <p />
           <div class="mx-2" v-if="!isMobile">
             <h3 :class="'lead'">📑🔗你可以轻松地将文件上传到我们的服务器，并通过简单的点击下载你需要的文件。</h3>
             <h3 :class="'lead'">⏳📊实时显示你上传文件的处理状态，包括剩余时间和处理进度，让你清楚地了解文件处理的情况。</h3>
@@ -190,7 +190,7 @@
               <h1 class="display-4">Copy Paste Tool</h1>
             </el-tag>
           </el-divider>
-          <br>
+          <p />
           <div class="mx-2" v-if="!isMobile">
             <h3 :class="'lead'">✍️📝你可以在文本框中轻松地输入你想要传输的文本内容，界面简洁清晰，操作方便。</h3>
             <h3 :class="'lead'">📋✂️提供了一键复制文本内容到剪贴板的功能，让你可以轻松复制所需文本，提高了使用效率。</h3>
