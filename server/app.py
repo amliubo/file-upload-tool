@@ -92,34 +92,29 @@ def get_file_list():
 
 
 @app.route("/upload", methods=["POST"])
-def upload_file():
-    if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file"}), 400
-    filename = file.filename
-    base_name, ext = os.path.splitext(filename)
-    save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-    counter = 1
-    new_filename = filename
-    while os.path.exists(save_path):
-        new_filename = f"{base_name}({counter}){ext}"
-        save_path = os.path.join(app.config["UPLOAD_FOLDER"], new_filename)
-        counter += 1
-    file.save(save_path)
-    file_upload_times[new_filename] = datetime.now()
-
-    # 增加文件服务次数
+def upload_files():
+    saved_files = []
+    for file in request.files.getlist('file'):
+        if file.filename == "":
+            continue
+        filename = file.filename
+        base_name, ext = os.path.splitext(filename)
+        save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        counter = 1
+        new_filename = filename
+        while os.path.exists(save_path):
+            new_filename = f"{base_name}({counter}){ext}"
+            save_path = os.path.join(app.config["UPLOAD_FOLDER"], new_filename)
+            counter += 1
+        file.save(save_path)
+        file_upload_times[new_filename] = datetime.now()
+        saved_files.append(new_filename)
     increment_file_service_count()
-
-    return jsonify({"success": True, "filename": new_filename}), 200
-
+    return jsonify({"success": True, "filenames": saved_files}), 200
 
 @app.route("/download/<filename>")
 def download_file(filename):
     uploads_folder = os.path.join(os.getcwd(), app.config["UPLOAD_FOLDER"])
-    # 增加文件服务次数
     increment_file_service_count()
     return send_from_directory(uploads_folder, filename, as_attachment=True)
 
@@ -128,7 +123,6 @@ def download_file(filename):
 def update_textarea():
     content = request.json.get("content")
     app.config["textarea_content"] = content
-    # 增加文本服务次数
     increment_text_service_count()
     return jsonify({"status": "success"})
 

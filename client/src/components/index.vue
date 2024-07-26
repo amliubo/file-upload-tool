@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <el-upload class="upload-demo" drag :action="uploadAction" multiple @on-success="fetchServerFiles">
+      <el-upload class="upload-demo" drag :action="uploadAction" multiple @success="fetchServerFiles">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
           将文件拖放到此处或<em>单击上传</em>
