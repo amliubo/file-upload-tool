@@ -30,26 +30,26 @@
           <div class="menu-title">
             <div v-if="filesBadgeValue > 0">
               <el-badge :value="filesBadgeValue" class="item" type="success">
-                <span style="font-size: 17px;">
-                  📂文件
+                <span style="font-size: 24px;">
+                  🗂️ 文件
                 </span>
               </el-badge>
             </div>
             <div v-else>
-              <span style="font-size: 17px;">
-                📂文件
+              <span style="font-size: 24px;">
+                🗂️ 文件
               </span>
             </div>
           </div>
         </template>
-        <el-menu-item index="1-1" style="font-size: 17px;">
+        <el-menu-item index="1-1" style="font-size: 22px;">
           ⚙️组件方式
         </el-menu-item>
-        <el-menu-item index="1-2" style="font-size: 17px;">非组件方式</el-menu-item>
+        <el-menu-item index="1-2" style="font-size: 22px;">非组件方式</el-menu-item>
       </el-sub-menu>
-      <el-menu-item index="2" style="font-size: 17px;">
+      <el-menu-item index="2" style="font-size: 24px;">
         <el-badge class="item">
-          📄文本
+          🗒️ 文本
         </el-badge>
       </el-menu-item>
     </el-menu>
