@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -15,7 +14,8 @@ export default defineConfig({
     }),
     Components({
       resolvers: [ElementPlusResolver()],
-    }),],
+    })
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -24,5 +24,11 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 80
+  },
+  define: {
+    'process.env': {
+      API_URL: process.env.VITE_API_URL,
+      UPLOAD_URL: process.env.VITE_UPLOAD_URL
+    }
   }
 })

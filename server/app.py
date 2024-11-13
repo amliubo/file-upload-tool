@@ -1,4 +1,8 @@
 import os
+import re
+import requests
+import time
+from datetime import datetime, timedelta
 import threading
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
@@ -7,9 +11,7 @@ from datetime import datetime
 UPLOAD_FOLDER = "uploads"
 COUNT_FILE = "service_counts.txt"
 app = Flask(__name__)
-app.config.from_object(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-app.config["textarea_content"] = ""
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 file_upload_times = {}
@@ -94,7 +96,7 @@ def get_file_list():
 @app.route("/upload", methods=["POST"])
 def upload_files():
     saved_files = []
-    for file in request.files.getlist('file'):
+    for file in request.files.getlist("file"):
         if file.filename == "":
             continue
         filename = file.filename
@@ -111,6 +113,7 @@ def upload_files():
         saved_files.append(new_filename)
     increment_file_service_count()
     return jsonify({"success": True, "filenames": saved_files}), 200
+
 
 @app.route("/download/<filename>")
 def download_file(filename):
@@ -131,6 +134,86 @@ def update_textarea():
 def get_textarea_content():
     content = app.config["textarea_content"]
     return jsonify({"content": content})
+
+
+@app.route("/get_build_data")
+def get_build_date():
+    def get_latest_succ_ids(job_name, count=10):
+        base_url = f"http://liqingguo:1114f1e5b57e96cc4d677ff0932dfbcd54@10.10.20.45:8080/job/{job_name}/api/json"
+        params = {"tree": "builds[number,result]"}
+        builds = requests.get(base_url, params=params).json().get("builds", [])
+        successful_build_ids = [
+            build["number"] for build in builds if build.get("result") == "SUCCESS"
+        ][:count]
+        print(job_name, successful_build_ids)
+        return successful_build_ids
+
+    lines = [
+        "Mahjong_Android_Line1",
+        "Mahjong_Android_Line2",
+        "Mahjong_Android_Line3",
+        "Mahjong_iOS_Line1",
+        "Mahjong_iOS_Line2",
+        "Mahjong_iOS_Line3",
+    ]
+    all_data = []
+    for line in lines:
+        try:
+            for job_num in get_latest_succ_ids(line):
+                url = f"http://liqingguo:1114f1e5b57e96cc4d677ff0932dfbcd54@10.10.20.45:8080/job/{line}/{job_num}/api/json/"
+                response = requests.post(url).json()
+                parameter_dict = {
+                    param["name"]: param["value"]
+                    for action in response.get("actions", [])
+                    if action.get("_class") == "hudson.model.ParametersAction"
+                    for param in action.get("parameters", [])
+                }
+                branch = parameter_dict.get("branch")
+                channel = parameter_dict.get("channel")
+                build_plan = parameter_dict.get("buildPlan")
+                network = parameter_dict.get("network")
+                build_time = (
+                    datetime.utcfromtimestamp(response["timestamp"] / 1000)
+                    + timedelta(hours=8)
+                ).strftime("%m/%d %H:%M:%S")
+                png_url = re.search(
+                    r"http://[^\s]+\.png", response.get("description", "")
+                )
+                png_url = png_url.group(0) if png_url else None
+
+                package_url = re.search(
+                    r"http://[^\s]+\.(apk|ipa)(?=>)", response.get("description", "")
+                )
+                package_url = package_url.group(0) if package_url else None
+
+                jenkins_url = re.search(
+                    r"http://10\.10\.20\.45:8080/job/[^/]+/\d+/",
+                    response.get("description", ""),
+                )
+                jenkins_url = jenkins_url.group(0) if jenkins_url else None
+
+                data = {
+                    "channel": channel,
+                    "build_time": build_time,
+                    "png_url": png_url,
+                    "package_url": package_url,
+                    "branch": branch,
+                    "build_plan": build_plan,
+                    "network": network,
+                    "jenkins_url": jenkins_url,
+                }
+                all_data.append(data)
+
+        except:
+            print(f"跳过：检测管线请求失败：{line} 不存在成功的构建")
+            continue
+    unique_data = {}
+    for data in all_data:
+        key = (data["channel"], data["branch"], data["build_plan"])
+        if key not in unique_data:
+            unique_data[key] = data
+    data = sorted(unique_data.values(), key=lambda x: x["build_time"], reverse=True)
+    return data
 
 
 if __name__ == "__main__":

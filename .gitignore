@@ -3,3 +3,4 @@ node_modules/
 /dist/
 env/
 __pycache__
+server/service_counts.txt

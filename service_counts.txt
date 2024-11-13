@@ -1,2 +1,0 @@
-file_service_count: 379
-text_service_count: 1286
