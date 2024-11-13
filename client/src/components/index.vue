@@ -34,6 +34,7 @@
           <svg-icon iconName="iconpackage" />&nbsp;Package Viewer
         </el-button>
       </el-badge>
+    <p></p>
     </div>
     <el-menu
       :default-active="activeIndex"
