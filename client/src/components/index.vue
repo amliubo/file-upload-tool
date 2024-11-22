@@ -134,7 +134,7 @@
         <el-tag round>
           <p
             style="
-              font-size: 34px;
+              font-size: 24px;
               font-weight: 300;
               text-align: right;
               font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
