@@ -35,7 +35,7 @@ def write_service_counts(counts):
     with lock:
         with open(COUNT_FILE, "w") as file:
             for key, value in counts.items():
-                file.write(f"{key}: {value}\n")
+                file.write("{}: {}\n".format(key, value))
 
 
 @app.route("/get_file_service_count")
@@ -138,15 +138,35 @@ def get_textarea_content():
 
 @app.route("/get_build_data")
 def get_build_date():
-    def get_latest_succ_ids(job_name, count=10):
+    def get_latest_succ_ids(job_name, count=12):
         base_url = f"http://liqingguo:1114f1e5b57e96cc4d677ff0932dfbcd54@10.10.20.45:8080/job/{job_name}/api/json"
         params = {"tree": "builds[number,result]"}
         builds = requests.get(base_url, params=params).json().get("builds", [])
         successful_build_ids = [
             build["number"] for build in builds if build.get("result") == "SUCCESS"
         ][:count]
-        print(job_name, successful_build_ids)
         return successful_build_ids
+
+    channel_translation = {
+        "kujian_and": "国服安卓",
+        "kujian_ios": "国服iOS",
+        "judian_dreamgp": "海外安卓",
+        "judian_dreamios": "海外iOS",
+    }
+
+    branch_translation = {
+        "origin/trunk_2022_3": "主干",
+    }
+
+    build_plan_translate = {"private_test": "内网测试", "release": "正式环境"}
+
+    network_translated = {
+        "default": "测试服",
+        "private_qa": "qa 服",
+        "release": "正式服",
+        "private_time": "时间服",
+        "private_global": "外服内网",
+    }
 
     lines = [
         "Mahjong_Android_Line1",
@@ -169,6 +189,8 @@ def get_build_date():
                     for param in action.get("parameters", [])
                 }
                 branch = parameter_dict.get("branch")
+                if branch != "origin/trunk_2022_3":
+                    continue
                 channel = parameter_dict.get("channel")
                 build_plan = parameter_dict.get("buildPlan")
                 network = parameter_dict.get("network")
@@ -185,21 +207,29 @@ def get_build_date():
                     r"http://[^\s]+\.(apk|ipa)(?=>)", response.get("description", "")
                 )
                 package_url = package_url.group(0) if package_url else None
-
+                os = re.search(r"\.(apk|ipa)$", package_url)
+                os = os.group(0)
                 jenkins_url = re.search(
                     r"http://10\.10\.20\.45:8080/job/[^/]+/\d+/",
                     response.get("description", ""),
                 )
                 jenkins_url = jenkins_url.group(0) if jenkins_url else None
 
+                # 翻译数据
+                translated_channel = channel_translation.get(channel, [])
+                translated_branch = branch_translation.get(branch, [])
+                translated_build_plan = build_plan_translate.get(build_plan, [])
+                translated_network = network_translated.get(network, [])
+
                 data = {
-                    "channel": channel,
+                    "os": os,
+                    "channel": translated_channel,
                     "build_time": build_time,
                     "png_url": png_url,
                     "package_url": package_url,
-                    "branch": branch,
-                    "build_plan": build_plan,
-                    "network": network,
+                    "branch": translated_branch,
+                    "build_plan": translated_build_plan,
+                    "network": translated_network,
                     "jenkins_url": jenkins_url,
                 }
                 all_data.append(data)
@@ -207,9 +237,13 @@ def get_build_date():
         except:
             print(f"跳过：检测管线请求失败：{line} 不存在成功的构建")
             continue
-    unique_data = {}
+        unique_data = {}
     for data in all_data:
-        key = (data["channel"], data["branch"], data["build_plan"])
+        key = (
+            str(data["channel"]),
+            str(data["branch"]),
+            str(data["build_plan"]),
+        )
         if key not in unique_data:
             unique_data[key] = data
     data = sorted(unique_data.values(), key=lambda x: x["build_time"], reverse=True)

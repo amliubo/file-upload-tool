@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import index from '../components/index.vue'
-import jenkins from '../components/package.vue'
+import pkg from '../components/pkg.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,9 +11,9 @@ const router = createRouter({
       component: index,
     },
     {
-      path: '/package',
-      name: 'package',
-      component: jenkins,
+      path: '/pkg',
+      name: 'pkg',
+      component: pkg,
     }
   ]
 })
