@@ -32,7 +32,7 @@
     </p>
     <el-input
       v-model="search"
-      placeholder="搜索内容 ( 支持： Branches、Channel、Build Plan、Network )"
+      placeholder="搜索过滤 ( 支持： Branches、Channel、Build Plan、Network、Build Time )"
       class="zoom-input"
       style="margin-bottom: 20px; height: 38px"
     />
@@ -256,7 +256,8 @@ export default {
           item.branch.includes(search.value.toLowerCase()) ||
           item.channel.includes(search.value.toLowerCase()) ||
           item.build_plan.includes(search.value.toLowerCase()) ||
-          item.network.includes(search.value.toLowerCase())
+          item.network.includes(search.value.toLowerCase()) ||
+          item.build_time.includes(search.value.toLowerCase())
         );
       });
     });
