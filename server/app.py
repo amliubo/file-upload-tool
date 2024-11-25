@@ -138,13 +138,13 @@ def get_textarea_content():
 
 @app.route("/get_build_data")
 def get_build_date():
-    def get_latest_succ_ids(job_name, count=12):
+    def get_latest_succ_ids(job_name):
         base_url = f"http://liqingguo:1114f1e5b57e96cc4d677ff0932dfbcd54@10.10.20.45:8080/job/{job_name}/api/json"
         params = {"tree": "builds[number,result]"}
         builds = requests.get(base_url, params=params).json().get("builds", [])
         successful_build_ids = [
             build["number"] for build in builds if build.get("result") == "SUCCESS"
-        ][:count]
+        ]
         return successful_build_ids
 
     channel_translation = {
@@ -152,6 +152,7 @@ def get_build_date():
         "kujian_ios": "国服iOS",
         "judian_dreamgp": "海外安卓",
         "judian_dreamios": "海外iOS",
+        "kujian_wechatminigame": "微信小游戏",
     }
 
     branch_translation = {
@@ -175,7 +176,20 @@ def get_build_date():
         "Mahjong_iOS_Line1",
         "Mahjong_iOS_Line2",
         "Mahjong_iOS_Line3",
+        "Mahjong_WebGL_Line2",
     ]
+    target_hosts = [
+        "10.10.243.92",
+        "10.10.243.92_branch",
+        # "121.36.31.27_test",
+        # "121.36.31.27",
+    ]
+    host_translated = {
+        "10.10.243.92": "内网测试网页",
+        "10.10.243.92_branch": "分支测试网页",
+        # "121.36.31.27_test": "外网测试",
+        # "121.36.31.27":"正式外网",
+    }
     all_data = []
     for line in lines:
         try:
@@ -198,29 +212,36 @@ def get_build_date():
                     datetime.utcfromtimestamp(response["timestamp"] / 1000)
                     + timedelta(hours=8)
                 ).strftime("%m/%d %H:%M:%S")
-                png_url = re.search(
-                    r"http://[^\s]+\.png", response.get("description", "")
-                )
-                png_url = png_url.group(0) if png_url else None
-
-                package_url = re.search(
-                    r"http://[^\s]+\.(apk|ipa)(?=>)", response.get("description", "")
-                )
-                package_url = package_url.group(0) if package_url else None
-                os = re.search(r"\.(apk|ipa)$", package_url)
-                os = os.group(0)
+                if channel in [
+                    "kujian_and",
+                    "kujian_ios",
+                    "judian_dreamgp",
+                    "judian_dreamios",
+                ]:
+                    png_url = re.search(
+                        r"http://[^\s]+\.png", response.get("description", "")
+                    ).group(0)
+                    package_url = re.search(
+                        r"http://[^\s]+\.(apk|ipa)(?=>)",
+                        response.get("description", ""),
+                    ).group(0)
+                    os = re.search(r"\.(apk|ipa)$", package_url).group(0)
+                else:
+                    png_url = re.search(
+                        r"http://[^\s]+\.jpg", response.get("description", "")
+                    ).group(0)
+                    package_url = None
+                    os = "minigame"
                 jenkins_url = re.search(
                     r"http://10\.10\.20\.45:8080/job/[^/]+/\d+/",
                     response.get("description", ""),
                 )
                 jenkins_url = jenkins_url.group(0) if jenkins_url else None
-
                 # 翻译数据
                 translated_channel = channel_translation.get(channel, [])
                 translated_branch = branch_translation.get(branch, [])
                 translated_build_plan = build_plan_translate.get(build_plan, [])
                 translated_network = network_translated.get(network, [])
-
                 data = {
                     "os": os,
                     "channel": translated_channel,
@@ -231,13 +252,97 @@ def get_build_date():
                     "build_plan": translated_build_plan,
                     "network": translated_network,
                     "jenkins_url": jenkins_url,
+                    "user": None,
                 }
                 all_data.append(data)
-
         except:
-            print(f"跳过：检测管线请求失败：{line} 不存在成功的构建")
+            # print(f"跳过：检测管线请求失败：{line} 不存在成功的构建")
             continue
-        unique_data = {}
+    # webgl
+    latest_builds = {}
+    user_info = {}
+
+    for webgl in get_latest_succ_ids("MahjongWebglUpload"):
+        url = f"http://liqingguo:1114f1e5b57e96cc4d677ff0932dfbcd54@10.10.20.45:8080/job/MahjongWebglUpload/{webgl}/api/json/"
+        response = requests.get(url).json()
+        target_host_value = None
+        file_value = None
+        username = None
+        for action in response.get("actions", []):
+            if (
+                "_class" in action
+                and action["_class"] == "hudson.model.ParametersAction"
+            ):
+                for param in action.get("parameters", []):
+                    if param["name"] == "target_host":
+                        target_host_value = param["value"]
+                    elif param["name"] == "file":
+                        file_value = param["value"]
+            if "_class" in action and action["_class"] == "hudson.model.CauseAction":
+                for cause in action.get("causes", []):
+                    if (
+                        "_class" in cause
+                        and cause["_class"] == "hudson.model.Cause$UserIdCause"
+                    ):
+                        username = cause.get("userName", None)
+        if target_host_value and file_value:
+            if (
+                target_host_value in target_hosts
+                and target_host_value not in latest_builds
+            ):
+                latest_builds[target_host_value] = file_value
+                if username:
+                    user_info[target_host_value] = username
+            if len(latest_builds) == len(target_hosts):
+                break
+        if len(latest_builds) == len(target_hosts):
+            break
+
+    for webgl in get_latest_succ_ids("Mahjong_WebGL_Line1"):
+        url = f"http://liqingguo:1114f1e5b57e96cc4d677ff0932dfbcd54@10.10.20.45:8080/job/Mahjong_WebGL_Line1/{webgl}/api/json/"
+        response = requests.get(url).json()
+        for target_host in target_hosts:
+            if target_host in latest_builds:
+                version = latest_builds[target_host].split("-")[-1].replace(".zip", "")
+                if version in response.get("description", ""):
+                    parameter_dict = {
+                        param["name"]: param["value"]
+                        for action in response.get("actions", [])
+                        if action.get("_class") == "hudson.model.ParametersAction"
+                        for param in action.get("parameters", [])
+                    }
+                    branch = parameter_dict.get("branch")
+                    channel = parameter_dict.get("channel")
+                    build_plan = parameter_dict.get("buildPlan")
+                    network = parameter_dict.get("network")
+                    build_time = (
+                        datetime.utcfromtimestamp(response["timestamp"] / 1000)
+                        + timedelta(hours=8)
+                    ).strftime("%m/%d %H:%M:%S")
+                    jenkins_url = re.search(
+                        r"http://10\.10\.20\.45:8080/job/[^/]+/\d+/",
+                        response.get("description", ""),
+                    )
+                    jenkins_url = jenkins_url.group(0) if jenkins_url else None
+
+                    # 翻译
+                    translated_channel = channel_translation.get(channel, [])
+                    translated_build_plan = build_plan_translate.get(build_plan, [])
+                    translated_network = network_translated.get(network, [])
+
+                    translated_host = host_translated.get(target_host, [])
+                    data = {
+                        "os": "web",
+                        "channel": translated_host,
+                        "build_time": build_time,
+                        "branch": branch,
+                        "build_plan": translated_build_plan,
+                        "network": translated_network,
+                        "jenkins_url": jenkins_url,
+                        "user": user_info[target_host],
+                    }
+                    all_data.insert(0, data)
+    unique_data = {}
     for data in all_data:
         key = (
             str(data["channel"]),
@@ -246,7 +351,7 @@ def get_build_date():
         )
         if key not in unique_data:
             unique_data[key] = data
-    data = sorted(unique_data.values(), key=lambda x: x["build_time"], reverse=True)
+    data = sorted(unique_data.values(), key=lambda x: x["build_plan"])
     return data
 
 

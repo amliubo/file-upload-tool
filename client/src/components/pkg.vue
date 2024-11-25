@@ -10,18 +10,6 @@
         >
       </el-badge>
       <el-tag type="success" round>
-        <!-- <p
-          style="
-            font-size: 34px;
-            font-weight: 300;
-            text-align: right;
-            font-style: italic;
-            letter-spacing: 2px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-          "
-        >
-          Package Tool
-        </p> -->
         <p
           style="
             font-size: 34px;
@@ -39,8 +27,8 @@
       </el-tag>
     </div>
     <p></p>
-    <p style="font-size: 20px; font-weight: 300">
-      我们可以帮助你轻易获取多渠道最新Package，并提供多种操作供你使用。
+    <p style="font-size: 22px; font-weight: 300">
+      我们可以帮助你轻易获取各渠道最新Package，并提供多种操作供你使用。
     </p>
     <el-input
       v-model="search"
@@ -53,13 +41,31 @@
       v-if="!loading"
       :data="filteredData"
       stripe
-      style="width: 100%; font-size: 16px"
+      style="font-size: 16px"
     >
       <el-table-column prop="os" label="OS" width="60" align="center">
         <template v-slot="scope">
           <div class="icon-logo">
-            <svg-icon v-if="scope.row.os === '.apk'" iconName="iconanzhuo" />
-            <svg-icon v-else-if="scope.row.os === '.ipa'" iconName="iconiOS" />
+            <svg-icon
+              :color="'#3DDC84'"
+              v-if="scope.row.os === '.apk'"
+              iconName="iconanzhuo"
+            />
+            <svg-icon
+              :color="'#007AFF'"
+              v-else-if="scope.row.os === '.ipa'"
+              iconName="iconiOS"
+            />
+            <svg-icon
+              :color="'#007AFF'"
+              v-else-if="scope.row.os === 'minigame'"
+              iconName="iconxiaochengxu1"
+            />
+            <svg-icon
+              :color="'#3498db'"
+              v-else-if="scope.row.os === 'web'"
+              iconName="iconbg-ie-browser"
+            />
           </div>
         </template>
       </el-table-column>
@@ -67,14 +73,50 @@
         prop="branch"
         label="Branche"
         align="center"
-        width="90"
+        width="110"
       />
       <el-table-column
         prop="channel"
         label="Channel"
         align="center"
-        width="90"
-      />
+        width="120"
+      >
+        <template v-slot="scope">
+          <div
+            v-if="
+              scope.row.os === 'web' && scope.row.channel === '内网测试网页'
+            "
+          >
+            <el-link
+              href="https://sdkapi-q.ggbak.com/gameCenter/enjoy?token=zzk4puUOWCH13TXOOb6AuOgAW4AMEjwTpyPs+B0ai/4bCNlI5c5B97Oa22f9GZTiAulLuWVOud86+EudHyYqXwkOM6JDpfxcIUxjkQLfycPJlUKOsIFo8rjmm1TwWwXg"
+              target="_blank"
+              type="primary"
+              class="link-style"
+            >
+              {{ scope.row.channel }}
+            </el-link>
+          </div>
+          <div
+            v-else-if="
+              scope.row.os === 'web' && scope.row.channel === '分支测试网页'
+            "
+          >
+            >
+            <el-link
+              href="https://sdkapi-q.ggbak.com/gameCenter/enjoy?token=zzk4puUOWCH13TXOOb6AuAGdxfHPoC0xoQ0j3LGo3hd4e/NQFBVhsA3+t68RAgX0AulLuWVOud86+EudHyYqXwkOM6JDpfxcIUxjkQLfycPaA8zFp3ffv+ipUlkm3LFI"
+              target="_blank"
+              type="primary"
+              class="link-style"
+            >
+              {{ scope.row.channel }}
+            </el-link>
+          </div>
+          <div v-else>
+            {{ scope.row.channel }}
+          </div>
+        </template>
+      </el-table-column>
+
       <el-table-column
         prop="build_plan"
         label="Build Plan"
@@ -92,7 +134,17 @@
         label="Build Time"
         align="center"
         width="140"
-      />
+      >
+        <template v-slot="scope">
+          <el-tag
+            round
+            type="info"
+            :style="{ fontSize: '13.5px' }"
+            >{{ scope.row.build_time }}</el-tag
+          >
+        </template>
+      </el-table-column>
+
       <el-table-column prop="operate" label="Operate">
         <template v-slot="scope">
           <div class="operation-row">
@@ -104,10 +156,14 @@
                 target="_blank"
                 class="link-style"
               >
-                Jenkins Detail
+                Jenkins
               </el-link>
             </div>
-            <div class="operation-item">
+
+            <div
+              class="operation-item"
+              v-if="scope.row.os === '.apk' || scope.row.os === '.ipa'"
+            >
               <svg-icon iconName="iconxiazai" class="icon-style" />
               <el-link
                 :type="scope.row.package_url ? 'primary' : 'info'"
@@ -124,7 +180,22 @@
                 }}
               </el-link>
             </div>
-            <div class="operation-item">
+            <div class="operation-item" v-if="scope.row.os === 'web'">
+              <el-input
+                v-model="scope.row.user"
+                disabled
+                class="user-input"
+                style="max-width: 130px"
+              >
+                <template #prefix>
+                  <svg-icon iconName="iconuser" class="icon-style" />
+                </template>
+              </el-input>
+            </div>
+            <div
+              class="operation-item"
+              v-if="['.apk', '.ipa', 'minigame'].includes(scope.row.os)"
+            >
               <el-popover placement="right" width="200" trigger="hover">
                 <template v-slot:reference>
                   <span class="link-style">
@@ -164,7 +235,6 @@ export default {
         tableData.value = Array.isArray(response.data)
           ? response.data
           : [response.data];
-        console.log(tableData.value);
       } finally {
         loading.value = false;
       }
@@ -242,10 +312,14 @@ export default {
   display: flex;
 }
 
+.qr-code {
+  width: 100%;
+  margin: 0 auto;
+}
 .icon-style {
-  font-size: 20px;
-  margin-right: 4px;
-  transition: color 0.3s ease;
+  font-size: 18px;
+  margin-right: 2px;
+  vertical-align: middle;
 }
 
 .operation-item {
@@ -254,13 +328,10 @@ export default {
   margin-right: 10px;
 }
 
-.qr-code {
-  width: 100%;
-  margin: 0 auto;
-}
-
 .link-style {
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .el-table-column {

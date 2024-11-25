@@ -13,9 +13,23 @@
         <el-descriptions>
           <el-descriptions-item>
             <template #label>
-              <span>已处理文件：{{ fileServiceCount }}</span>
+              <span
+                style="
+                  text-align: right;
+                  font-style: italic;
+                  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+                "
+                >已处理文件：{{ fileServiceCount }}</span
+              >
               &nbsp;
-              <span>已处理文本：{{ textServiceCount }}</span>
+              <span
+                style="
+                  text-align: right;
+                  font-style: italic;
+                  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+                "
+                >已处理文本：{{ textServiceCount }}</span
+              >
             </template>
           </el-descriptions-item>
         </el-descriptions>
@@ -134,7 +148,7 @@
         <el-tag round>
           <p
             style="
-              font-size: 24px;
+              font-size: 20px;
               font-weight: 300;
               text-align: right;
               font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
