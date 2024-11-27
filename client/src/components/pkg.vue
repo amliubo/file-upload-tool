@@ -304,7 +304,7 @@ export default {
 }
 
 .icon-logo {
-  font-size: 42px;
+  font-size: 32px;
   display: flex;
 }
 
@@ -313,23 +313,19 @@ export default {
   margin: 0 auto;
 }
 .icon-style {
-  font-size: 22px;
+  font-size: 20px;
   margin-right: 8px;
 }
 
 .operation-item {
   display: inline-flex;
   align-items: center;
-  margin-right: 10px;
+  margin-right: 11px;
 }
 
 .link-style {
   font-size: 16px;
   display: inline-flex;
   align-items: center;
-}
-
-.el-table-column {
-  padding: 10px 0;
 }
 </style>
