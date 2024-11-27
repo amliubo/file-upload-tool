@@ -159,7 +159,11 @@ def get_build_date():
         "origin/trunk_2022_3": "主干",
     }
 
-    build_plan_translate = {"private_test": "内网测试", "release": "正式环境"}
+    build_plan_translate = {
+        "private_test": "内网测试",
+        "release": "正式环境",
+        "automation": "自动化",
+    }
 
     network_translated = {
         "default": "测试服",
@@ -202,6 +206,8 @@ def get_build_date():
                     if action.get("_class") == "hudson.model.ParametersAction"
                     for param in action.get("parameters", [])
                 }
+                if not isinstance(response.get("description", ""), str):
+                    continue
                 branch = parameter_dict.get("branch")
                 if branch != "origin/trunk_2022_3":
                     continue
@@ -252,7 +258,6 @@ def get_build_date():
                     "build_plan": translated_build_plan,
                     "network": translated_network,
                     "jenkins_url": jenkins_url,
-                    "user": None,
                 }
                 all_data.append(data)
         except:
@@ -351,9 +356,10 @@ def get_build_date():
             str(data["build_plan"]),
         )
         if key not in unique_data:
+            data["build_plan"] = str(data["build_plan"])
             unique_data[key] = data
-    data = sorted(unique_data.values(), key=lambda x: x["build_plan"])
-    return data
+    sorted_data = sorted(unique_data.values(), key=lambda x: x["build_plan"])
+    return sorted_data
 
 
 if __name__ == "__main__":
