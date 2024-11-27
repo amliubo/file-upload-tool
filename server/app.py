@@ -311,7 +311,8 @@ def get_build_date():
                         if action.get("_class") == "hudson.model.ParametersAction"
                         for param in action.get("parameters", [])
                     }
-                    branch = parameter_dict.get("branch")
+                    # branch = parameter_dict.get("branch")
+                    branch = parameter_dict.get("branch", "").replace("origin/", "")
                     channel = parameter_dict.get("channel")
                     build_plan = parameter_dict.get("buildPlan")
                     network = parameter_dict.get("network")

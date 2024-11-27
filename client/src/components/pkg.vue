@@ -27,21 +27,21 @@
       </el-tag>
     </div>
     <p></p>
-    <p style="font-size: 22px; font-weight: 300">
+    <p style="font-size: 24px; font-weight: 300">
       我们可以帮助你轻易获取各渠道最新Package，并提供多种操作供你使用。
     </p>
     <el-input
       v-model="search"
       placeholder="搜索过滤 ( 支持： Branches、Channel、Build Plan、Network、Build Time )"
       class="zoom-input"
-      style="margin-bottom: 20px; height: 38px"
+      style="margin-bottom: 10px; height: 40px"
     />
     <custom-loading :loading="loading" />
     <el-table
       v-if="!loading"
       :data="filteredData"
       stripe
-      style="font-size: 16px"
+      style="font-size: 17px"
     >
       <el-table-column prop="os" label="OS" width="60" align="center">
         <template v-slot="scope">
@@ -73,7 +73,7 @@
         prop="branch"
         label="Branche"
         align="center"
-        width="110"
+        width="140"
       />
       <el-table-column
         prop="channel"
@@ -101,7 +101,6 @@
               scope.row.os === 'web' && scope.row.channel === '分支测试网页'
             "
           >
-            >
             <el-link
               href="https://sdkapi-q.ggbak.com/gameCenter/enjoy?token=zzk4puUOWCH13TXOOb6AuAGdxfHPoC0xoQ0j3LGo3hd4e/NQFBVhsA3+t68RAgX0AulLuWVOud86+EudHyYqXwkOM6JDpfxcIUxjkQLfycPaA8zFp3ffv+ipUlkm3LFI"
               target="_blank"
@@ -121,7 +120,7 @@
         prop="build_plan"
         label="Build Plan"
         align="center"
-        width="110"
+        width="120"
       />
       <el-table-column
         prop="network"
@@ -133,15 +132,12 @@
         prop="build_time"
         label="Build Time"
         align="center"
-        width="140"
+        width="130"
       >
         <template v-slot="scope">
-          <el-tag
-            round
-            type="info"
-            :style="{ fontSize: '13.5px' }"
-            >{{ scope.row.build_time }}</el-tag
-          >
+          <el-tag round type="info" :style="{ fontSize: '14px' }">{{
+            scope.row.build_time
+          }}</el-tag>
         </template>
       </el-table-column>
 
@@ -159,7 +155,26 @@
                 Jenkins
               </el-link>
             </div>
-
+            <div
+              class="operation-item"
+              v-if="['.apk', '.ipa', 'minigame'].includes(scope.row.os)"
+            >
+              <el-popover placement="right" width="200" trigger="hover">
+                <template v-slot:reference>
+                  <span class="link-style">
+                    <svg-icon iconName="iconiconfontscan" class="icon-style" />
+                    <el-link
+                      :type="scope.row.png_url ? 'danger' : 'info'"
+                      :disabled="!scope.row.png_url"
+                      class="link-style"
+                    >
+                      二维码
+                    </el-link>
+                  </span>
+                </template>
+                <img :src="scope.row.png_url" class="qr-code" />
+              </el-popover>
+            </div>
             <div
               class="operation-item"
               v-if="scope.row.os === '.apk' || scope.row.os === '.ipa'"
@@ -185,32 +200,12 @@
                 v-model="scope.row.user"
                 disabled
                 class="user-input"
-                style="max-width: 130px"
+                style="max-width: 120px"
               >
                 <template #prefix>
                   <svg-icon iconName="iconuser" class="icon-style" />
                 </template>
               </el-input>
-            </div>
-            <div
-              class="operation-item"
-              v-if="['.apk', '.ipa', 'minigame'].includes(scope.row.os)"
-            >
-              <el-popover placement="right" width="200" trigger="hover">
-                <template v-slot:reference>
-                  <span class="link-style">
-                    <svg-icon iconName="iconiconfontscan" class="icon-style" />
-                    <el-link
-                      :type="scope.row.png_url ? 'danger' : 'info'"
-                      :disabled="!scope.row.png_url"
-                      class="link-style"
-                    >
-                      二维码
-                    </el-link>
-                  </span>
-                </template>
-                <img :src="scope.row.png_url" class="qr-code" />
-              </el-popover>
             </div>
           </div>
         </template>
@@ -318,9 +313,8 @@ export default {
   margin: 0 auto;
 }
 .icon-style {
-  font-size: 18px;
-  margin-right: 2px;
-  vertical-align: middle;
+  font-size: 22px;
+  margin-right: 8px;
 }
 
 .operation-item {
