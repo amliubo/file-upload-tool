@@ -333,7 +333,7 @@ def get_build_date():
 
                     # 翻译
                     translated_channel = channel_translation.get(channel, [])
-                    translated_build_plan = build_plan_translate.get(build_plan, [])
+                    translated_build_plan = build_plan_translate.get(build_plan, build_plan)
                     translated_network = network_translated.get(network, [])
 
                     translated_host = host_translated.get(target_host, [])
