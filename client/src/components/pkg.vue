@@ -1,70 +1,72 @@
 <template>
   <div class="app">
-    <div
-      style="display: flex; justify-content: space-between; align-items: center"
-    >
-      <el-badge value="hot" class="item">
-        <el-button plain @click="navigateTo"
-          ><svg-icon iconName="icongongxiangzhongxin" />&nbsp;Upload
-          Tool</el-button
-        >
-      </el-badge>
-      <el-tag type="success" round>
-        <p
-          style="
-            font-size: 34px;
-            font-weight: 300;
-            text-align: right;
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-            font-style: italic;
-            transform: skew(-5deg, -2deg);
-            letter-spacing: 1.5px;
-            line-height: 1.2;
-          "
-        >
-          Package Tool
-        </p>
-      </el-tag>
+    <div style="flex-grow: 1; display: flex; justify-content: flex-end">
+      <div class="container">
+        <el-badge value="hot" class="item">
+          <el-button round @click="navigateTo"
+            ><svg-icon iconName="icongongxiangzhongxin" />
+            <td>Upload Tool</td></el-button
+          >
+        </el-badge>
+        <el-tag type="success" round>
+          <p
+            style="
+              font-size: 34px;
+              font-weight: 300;
+              text-align: right;
+              font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+              font-style: italic;
+              transform: skew(-5deg, -2deg);
+              letter-spacing: 1.5px;
+              line-height: 1.2;
+            "
+          >
+            Package Tool
+          </p>
+        </el-tag>
+      </div>
     </div>
-    <p></p>
-    <p style="font-size: 24px; font-weight: 300">
-      我们可以帮助你轻易获取各渠道最新Package，并提供多种操作供你使用。
+    <p style="margin: 7px 0 7px 0; font-size: 23px; font-weight: 300">
+      👋我们可以帮助你轻易获取各渠道最新Package并提供多种操作供你使用。
     </p>
     <el-input
       v-model="search"
-      placeholder="搜索过滤 ( 支持： Branches、Channel、Build Plan、Network、Build Time )"
+      placeholder="搜索（支持：Branches、Channel、Build Plan、Network、Build Time）"
       class="zoom-input"
-      style="margin-bottom: 10px; height: 40px"
+      style="margin-top: 0"
     />
     <custom-loading :loading="loading" />
     <el-table
       v-if="!loading"
       :data="filteredData"
-      stripe
-      style="font-size: 17px"
+      style="font-size: 16px; font-weight: 300"
     >
-      <el-table-column prop="os" label="OS" width="60" align="center">
+      <el-table-column prop="os" label="OS" width="47">
         <template v-slot="scope">
-          <div class="icon-logo">
+          <div>
             <svg-icon
+              :className="'italic-large'"
               :color="'#3DDC84'"
               v-if="scope.row.os === '.apk'"
               iconName="iconanzhuo"
             />
             <svg-icon
+              :className="'italic-large'"
               :color="'#007AFF'"
               v-else-if="scope.row.os === '.ipa'"
-              iconName="iconiOS"
+              iconName="iconios"
             />
             <svg-icon
+              :className="'italic-large'"
               :color="'#007AFF'"
               v-else-if="scope.row.os === 'minigame'"
-              iconName="iconxiaochengxu1"
+              iconName="iconweixinxiaochengxu"
             />
             <svg-icon
-              :color="'#3498db'"
+              :className="'italic-large'"
+              :color="'#00A1F1'"
               v-else-if="scope.row.os === 'web'"
-              iconName="iconbg-ie-browser"
+              iconName="iconie-browser"
             />
           </div>
         </template>
@@ -73,7 +75,7 @@
         prop="branch"
         label="Branche"
         align="center"
-        width="140"
+        width="130"
       />
       <el-table-column
         prop="channel"
@@ -120,22 +122,22 @@
         prop="build_plan"
         label="Build Plan"
         align="center"
-        width="120"
+        width="106"
       />
       <el-table-column
         prop="network"
         label="Network"
         align="center"
-        width="100"
+        width="94"
       />
       <el-table-column
         prop="build_time"
         label="Build Time"
         align="center"
-        width="130"
+        width="131"
       >
         <template v-slot="scope">
-          <el-tag round type="info" :style="{ fontSize: '14px' }">{{
+          <el-tag round type="info" :style="{ fontSize: '13.2px' }">{{
             scope.row.build_time
           }}</el-tag>
         </template>
@@ -145,15 +147,15 @@
         <template v-slot="scope">
           <div class="operation-row">
             <div class="operation-item">
-              <svg-icon iconName="iconjenkins" class="icon-style" />
-              <el-link
-                type="success"
+              <el-button
+                plain
                 @click="handleDownload(scope.row.jenkins_url)"
-                target="_blank"
                 class="link-style"
+                size="small"
               >
+                <svg-icon iconName="iconjenkins" class="icon-style" />
                 Jenkins
-              </el-link>
+              </el-button>
             </div>
             <div
               class="operation-item"
@@ -161,16 +163,10 @@
             >
               <el-popover placement="right" width="200" trigger="hover">
                 <template v-slot:reference>
-                  <span class="link-style">
-                    <svg-icon iconName="iconiconfontscan" class="icon-style" />
-                    <el-link
-                      :type="scope.row.png_url ? 'danger' : 'info'"
-                      :disabled="!scope.row.png_url"
-                      class="link-style"
-                    >
-                      二维码
-                    </el-link>
-                  </span>
+                  <el-button plain size="small" class="link-style"
+                    ><svg-icon iconName="iconiconfontscan" class="icon-style" />
+                    QR
+                  </el-button>
                 </template>
                 <img :src="scope.row.png_url" class="qr-code" />
               </el-popover>
@@ -179,28 +175,28 @@
               class="operation-item"
               v-if="scope.row.os === '.apk' || scope.row.os === '.ipa'"
             >
-              <svg-icon iconName="iconxiazai" class="icon-style" />
-              <el-link
-                :type="scope.row.package_url ? 'primary' : 'info'"
-                :disabled="!scope.row.package_url"
+              <el-button
+                size="small"
+                plain
                 @click="handleDownload(scope.row.package_url)"
-                target="_blank"
                 class="link-style"
               >
+                <svg-icon iconName="iconxiazai" class="icon-style" />
                 {{
                   scope.row.package_url &&
                   scope.row.package_url.endsWith(".apk")
-                    ? "下载apk"
-                    : "下载ipa"
+                    ? "DLapk"
+                    : "DLipa"
                 }}
-              </el-link>
+              </el-button>
             </div>
             <div class="operation-item" v-if="scope.row.os === 'web'">
               <el-input
                 v-model="scope.row.user"
                 disabled
-                class="user-input"
-                style="max-width: 120px"
+                size="small"
+                class="link-style"
+                style="max-width: 155px"
               >
                 <template #prefix>
                   <svg-icon iconName="iconuser" class="icon-style" />
@@ -277,7 +273,7 @@ export default {
 .app {
   width: 50%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 25px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -288,6 +284,11 @@ export default {
 
 ::v-deep .el-table th .cell {
   background-color: #f0f0f0;
+}
+
+.zoom-input {
+  margin-bottom: 4px;
+  height: 40px;
 }
 
 .zoom-input:hover {
@@ -303,29 +304,41 @@ export default {
   transform: scale(1.03);
 }
 
-.icon-logo {
-  font-size: 32px;
+.container {
   display: flex;
+  justify-content: space-between;
 }
 
 .qr-code {
   width: 100%;
   margin: 0 auto;
 }
+
+.italic-large {
+  transform: scale(1.7) skewX(-10deg);
+  width: 2em;
+  height: 2em;
+  display: inline-block;
+}
+
 .icon-style {
   font-size: 20px;
-  margin-right: 8px;
+  margin-right: 1px;
+}
+
+.operation-row {
+  display: flex;
+  flex-wrap: nowrap;
 }
 
 .operation-item {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 11px;
+  white-space: nowrap;
+  margin-right: 5px;
 }
 
 .link-style {
-  font-size: 16px;
   display: inline-flex;
-  align-items: center;
+  font-size: 16px;
+  font-weight: 300;
 }
 </style>

@@ -1,7 +1,6 @@
 import os
 import re
 import requests
-import time
 from datetime import datetime, timedelta
 import threading
 from flask import Flask, jsonify, request, send_from_directory
@@ -12,11 +11,11 @@ UPLOAD_FOLDER = "uploads"
 COUNT_FILE = "service_counts.txt"
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["cards"] = []
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 file_upload_times = {}
 lock = threading.Lock()
-
 
 def read_service_counts():
     with lock:
@@ -28,8 +27,6 @@ def read_service_counts():
                     key, value = line.strip().split(": ")
                     counts[key] = int(value)
                 return counts
-        return {"file_service_count": 0, "text_service_count": 0}
-
 
 def write_service_counts(counts):
     with lock:
@@ -37,12 +34,10 @@ def write_service_counts(counts):
             for key, value in counts.items():
                 file.write("{}: {}\n".format(key, value))
 
-
 @app.route("/get_file_service_count")
 def get_file_service_count():
     counts = read_service_counts()
     return jsonify({"count": counts["file_service_count"]})
-
 
 @app.route("/increment_file_service_count")
 def increment_file_service_count():
@@ -51,12 +46,10 @@ def increment_file_service_count():
     write_service_counts(counts)
     return jsonify({"count": counts["file_service_count"]})
 
-
 @app.route("/get_text_service_count", methods=["GET"])
 def get_text_service_count():
     counts = read_service_counts()
     return jsonify({"count": counts["text_service_count"]})
-
 
 @app.route("/increment_text_service_count", methods=["POST"])
 def increment_text_service_count():
@@ -64,7 +57,6 @@ def increment_text_service_count():
     counts["text_service_count"] += 1
     write_service_counts(counts)
     return jsonify({"count": counts["text_service_count"]})
-
 
 @app.route("/file_list")
 def get_file_list():
@@ -92,7 +84,6 @@ def get_file_list():
                 os.remove(file_path)
     return jsonify({"files": file_list})
 
-
 @app.route("/upload", methods=["POST"])
 def upload_files():
     saved_files = []
@@ -114,13 +105,11 @@ def upload_files():
     increment_file_service_count()
     return jsonify({"success": True, "filenames": saved_files}), 200
 
-
 @app.route("/download/<filename>")
 def download_file(filename):
     uploads_folder = os.path.join(os.getcwd(), app.config["UPLOAD_FOLDER"])
     increment_file_service_count()
     return send_from_directory(uploads_folder, filename, as_attachment=True)
-
 
 @app.route("/update_textarea", methods=["POST"])
 def update_textarea():
@@ -129,12 +118,30 @@ def update_textarea():
     increment_text_service_count()
     return jsonify({"status": "success"})
 
-
 @app.route("/get_textarea_content")
 def get_textarea_content():
-    content = app.config["textarea_content"]
+    content = app.config.get("textarea_content", "")
     return jsonify({"content": content})
 
+@app.route("/get_card_contents", methods=["GET"])
+def get_card_contents():
+    return jsonify({"cards": app.config["cards"]})
+
+@app.route("/save_card_content", methods=["POST"])
+def save_card_content():
+    content = request.json.get("content")
+    counts = read_service_counts()
+    card_id = counts.get("card_id", 0) + 1
+    counts["card_id"] = card_id
+    write_service_counts(counts)
+    app.config["cards"].insert(0, {"content": content, "card_id": card_id})
+    return jsonify({"status": 'success', "card_id": card_id, "content": content})
+
+@app.route("/delete_card_content", methods=["POST"])
+def delete_card_content():
+    index = request.json.get("index")
+    app.config["cards"].pop(int(index))
+    return jsonify({"status": "success"})
 
 @app.route("/get_build_data")
 def get_build_date():
@@ -263,6 +270,18 @@ def get_build_date():
         except:
             # print(f"跳过：检测管线请求失败：{line} 不存在成功的构建")
             continue
+    # 安卓ios小程序排序 在web之前
+    unique_data = {}
+    for data in all_data:
+        key = (
+            str(data["channel"]),
+            str(data["branch"]),
+            str(data["build_plan"]),
+        )
+        if key not in unique_data:
+            data["build_plan"] = str(data["build_plan"])
+            unique_data[key] = data
+    sorted_data = sorted(unique_data.values(), key=lambda x: x["build_plan"])
     # webgl
     latest_builds = {}
     user_info = {}
@@ -347,18 +366,7 @@ def get_build_date():
                         "jenkins_url": jenkins_url,
                         "user": user_info[target_host],
                     }
-                    all_data.insert(0, data)
-    unique_data = {}
-    for data in all_data:
-        key = (
-            str(data["channel"]),
-            str(data["branch"]),
-            str(data["build_plan"]),
-        )
-        if key not in unique_data:
-            data["build_plan"] = str(data["build_plan"])
-            unique_data[key] = data
-    sorted_data = sorted(unique_data.values(), key=lambda x: x["build_plan"])
+                    sorted_data.insert(0, data)
     return sorted_data
 
 

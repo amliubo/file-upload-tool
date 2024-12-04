@@ -6,7 +6,7 @@
     >
       <div class="container">
         <el-badge value="new" class="item">
-          <el-button plain @click="navigateTo"
+          <el-button round @click="navigateTo"
             ><svg-icon iconName="iconquanqudao" />&nbsp;Package Tool</el-button
           >
         </el-badge>
@@ -55,7 +55,7 @@
           </div>
         </template>
         <el-menu-item index="1-1" style="font-size: 17px">
-          ⚙️组件方式
+          🔄组件方式
         </el-menu-item>
         <el-menu-item index="1-2" style="font-size: 17px"
           >非组件方式</el-menu-item
@@ -102,8 +102,8 @@
         <img :src="erwm" class="erweima" />
       </div>
     </div>
-
     <div v-if="activeIndex === '1-1'">
+      <p></p>
       <el-upload
         class="upload-demo"
         drag
@@ -116,6 +116,7 @@
       </el-upload>
     </div>
     <div v-else-if="activeIndex === '1-2'">
+      <p></p>
       <input type="file" ref="fileInput" @change="handleFileChange" multiple />
       <div v-if="selectedFiles && selectedFiles.length > 0">
         <hr />
@@ -130,6 +131,7 @@
         type="primary"
         @click="handleUpload"
         :disabled="!selectedFiles || selectedFiles.length === 0 || uploading"
+        style="height: 27px"
       >
         <span v-if="!uploading">
           <el-icon>
@@ -231,20 +233,71 @@
           <img :src="erwm" class="erweima" />
         </div>
       </div>
+      <p></p>
+      <el-card
+        shadow="never"
+        v-for="(card, index) in cards"
+        :key="index"
+        class="custom-card"
+      >
+        <div class="card-header">
+          <el-badge type="warning" :value="'# ' + card.card_id" />
+        </div>
+        <div class="card-content">
+          {{ card.content }}
+        </div>
+        <div class="card-buttons">
+          <el-button
+            type="success"
+            @click="copyToClipboard(card.content)"
+            icon="CopyDocument"
+            round
+            plain
+            size="small"
+            style="margin-right: -5px; height: 20px"
+            >Cp
+          </el-button>
+          <el-button
+            type="danger"
+            @click="deleteCard(index)"
+            icon="Delete"
+            round
+            plain
+            size="small"
+            style="height: 20px"
+            >Del
+          </el-button>
+        </div>
+      </el-card>
       <el-input
         v-model="textarea"
-        :autosize="{ minRows: 10, maxRows: 18 }"
+        :autosize="{ minRows: 8, maxRows: 16 }"
         type="textarea"
         placeholder="Ctrl + c / v"
-        @input="updateBackendTextarea"
+        class="custom-input"
       />
-      <p></p>
-      <el-button @click="copyToClipboard" type="primary">
-        <el-icon><document-copy /></el-icon>&nbsp;复制
-      </el-button>
-      <el-button @click="clearTextarea" type="danger"
-        ><el-icon> <Delete /> </el-icon>&nbsp;清空</el-button
-      >
+      <div style="margin-top: 5px">
+        <el-button
+          @click="addCard"
+          type="primary"
+          style="margin-right: -5px; width: 70px; height: 27px"
+        >
+          <el-icon><Open /></el-icon>&nbsp;Ding
+        </el-button>
+        <el-button
+          @click="copyToClipboard()"
+          type="success"
+          style="margin-right: -5px; width: 70px; height: 27px"
+          ><el-icon><CopyDocument /></el-icon>&nbsp;Copy</el-button
+        >
+        <el-button
+          type="danger"
+          @click="clearTextarea"
+          style="width: 70px; height: 27px"
+        >
+          <el-icon><Delete /></el-icon>&nbsp;Clear
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -252,31 +305,30 @@
 <script>
 import axios from "axios";
 import { ref, onMounted } from "vue";
-import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import { checkIsMobile, showNotification } from "../utils/utils";
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 export default {
   setup() {
+    const isMobile = ref(false);
     const uploadAction = import.meta.env.VITE_UPLOAD_URL;
     const serverFiles = ref([]);
     const selectedFiles = ref([]);
     const activeIndex = ref("1-1");
     const textarea = ref("");
-    const isMobile = ref(false);
+    const cards = ref([]);
     const uploading = ref(false);
     const filesBadgeValue = ref("");
     const fileServiceCount = ref(0);
     const textServiceCount = ref(0);
     const file_help = ref([
-      "✈️你可以轻松地将文件上传到我们的服务器，并通过简单的点击下载你需要的文件。",
-      "⌛实时显示你上传文件的处理状态，包括剩余时间让你清楚了解文件处理的情况。",
-      "🖥️页面可以适应不同大小的设备，让你在任何设备上都能方便地使用文件共享功能。",
+      "✈️ 简单上传文件并轻松下载。⌛ 实时显示上传状态，了解进度。",
+      "🔄 支持组件和非组件方式，兼容全系统版本。🖥️ 页面自适应，随时随地使用文件共享。",
     ]);
     const text_help = ref([
-      "🚀你可以在文本框中轻松地输入你想要传输的文本内容，界面简洁清晰，操作方便。",
-      "📝提供一键复制文本内容到剪贴板的功能，让你可以轻松复制所需文本，提高了使用效率。",
-      "⌛实时显示文本传输服务的处理次数和最新的文本内容，让你随时了解当前传输状态。",
+      "🚀 输入文本轻松传输，界面简洁，操作方便。📝 一键复制文本到剪贴板，提升效率。",
+      "⌛ 实时显示传输次数与最新内容，随时了解状态。✨ 新增'Ding'功能，轻松管理文本信息。",
     ]);
     const erwm = ref("http://10.10.25.66/resource/erweima.png");
     const router = useRouter();
@@ -293,13 +345,6 @@ export default {
       }
       return null;
     };
-    const checkIsMobile = () => {
-      const isMobileDevice =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-      isMobile.value = isMobileDevice;
-    };
 
     const handleSelect = (index) => {
       activeIndex.value = index.toString();
@@ -315,7 +360,7 @@ export default {
       const response = await axios.get("/file_list");
       serverFiles.value = response.data.files;
       filesBadgeValue.value = response.data.files.length;
-      fetchFileServiceCount(); // 更新服务次数
+      fetchFileServiceCount();
     };
 
     const fetchFileServiceCount = async () => {
@@ -367,36 +412,38 @@ export default {
       for (let i = 0; i < selectedFiles.value.length; i++) {
         formData.append("file", selectedFiles.value[i]);
       }
-      axios
-        .post("/upload", formData)
-        .then(() => {
-          uploading.value = false;
-          fetchServerFiles();
-          fetchFileServiceCount();
-        })
-        .catch((error) => {
-          uploading.value = false;
-          ElMessage.error("上传文件时发生错误");
-          console.error("上传文件时发生错误：", error);
-        });
+      axios.post("/upload", formData).then(() => {
+        uploading.value = false;
+        fetchServerFiles();
+        fetchFileServiceCount();
+      });
     };
 
-    const copyToClipboard = async () => {
+    const copyToClipboard = async (content = null) => {
+      if (!content) {
+        if (textarea.value.trim().length !== 0) {
+          content = textarea.value;
+        } else {
+          return;
+        }
+      }
       const input = document.createElement("input");
-      input.value = textarea.value;
+      input.value = content;
       document.body.appendChild(input);
       input.select();
       document.execCommand("copy");
       document.body.removeChild(input);
-      ElMessage.success("复制成功！");
       await axios.post("/increment_text_service_count");
-      fetchTextServiceCount(); // 更新服务次数
+      fetchTextServiceCount();
+      showNotification("内容复制粘贴板！", isMobile.value, "msg");
     };
 
     const clearTextarea = async () => {
-      textarea.value = "";
-      updateBackendTextarea();
-      ElMessage.success("清理成功！");
+      if (textarea.value.trim().length !== 0) {
+        textarea.value = "";
+        updateBackendTextarea();
+        showNotification("内容清空！", isMobile.value, "msg");
+      }
     };
 
     const updateBackendTextarea = async () => {
@@ -420,21 +467,46 @@ export default {
       }, 500);
     };
 
+    const fetchCards = async () => {
+      const response = await axios.get("/get_card_contents");
+      cards.value = response.data.cards || [];
+    };
+
+    const addCard = async () => {
+      if (textarea.value.trim()) {
+        const response = await axios.post("/save_card_content", {
+          content: textarea.value,
+        });
+        const { card_id, content } = response.data;
+        cards.value.unshift({ content, card_id });
+        textarea.value = "";
+        showNotification("Ding! 内容置顶！", isMobile.value, "msg");
+      }
+    };
+
+    const deleteCard = async (index) => {
+      await axios.post("/delete_card_content", { index: index });
+      fetchCards();
+      showNotification("删除成功！", isMobile.value, "msg");
+    };
+
     onMounted(() => {
+      isMobile.value = checkIsMobile();
       const safariVersion = detectSafariVersion();
       if (safariVersion !== null && safariVersion < 14) {
         activeIndex.value = "1-2";
       } else {
         activeIndex.value = "1-1";
       }
+      fetchCards();
       fetchServerFiles();
-      checkIsMobile();
       updateRemainingTime();
       fetchFileServiceCount();
       fetchTextServiceCount();
     });
 
     return {
+      isMobile,
       activeIndex,
       fetchServerFiles,
       handleSelect,
@@ -446,7 +518,6 @@ export default {
       updateBackendTextarea,
       fetchBackendTextarea,
       uploadAction,
-      isMobile,
       handleFileChange,
       selectedFiles,
       uploading,
@@ -461,6 +532,9 @@ export default {
       text_help,
       erwm,
       navigateTo,
+      cards,
+      addCard,
+      deleteCard,
     };
   },
 };
@@ -474,20 +548,17 @@ export default {
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 @media (min-width: 768px) {
   .app {
     width: 50%;
   }
 }
-
 /* 统计部分 */
 .container {
   display: flex;
   justify-content: space-between;
 }
 /* 上传组件 */
-
 .file-info-container {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -503,13 +574,54 @@ export default {
   opacity: 1;
 }
 .erweima {
+  top: 150px;
   width: 150px;
-  transition: transform 0.3s ease;
+  position: fixed;
+  right: 26.3%;
 }
+
 .erweima:hover {
   transform: scale(1.05);
 }
 .erweima:hover {
   transform: scale(1.05);
+}
+
+.custom-input {
+  transition: box-shadow 0.3s ease-in-out;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-card {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.card-header {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.card-content {
+  margin: -4px;
+  font-size: 14px;
+  font-weight: 200;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+}
+.card-buttons {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+}
+
+.msg {
+  height: 20px;
 }
 </style>
