@@ -196,7 +196,7 @@
                 disabled
                 size="small"
                 class="link-style"
-                style="max-width: 155px"
+                style="width: 165px"
               >
                 <template #prefix>
                   <svg-icon iconName="iconuser" class="icon-style" />
