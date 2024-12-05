@@ -274,6 +274,7 @@
         :autosize="{ minRows: 8, maxRows: 16 }"
         type="textarea"
         placeholder="Ctrl + c / v"
+        @input="updateBackendTextarea"
         class="custom-input"
       />
       <div style="margin-top: 5px">
@@ -576,8 +577,8 @@ export default {
 .erweima {
   top: 150px;
   width: 150px;
-  position: fixed;
-  right: 26.3%;
+  position: absolute;
+  right: 26.5%;
 }
 
 .erweima:hover {

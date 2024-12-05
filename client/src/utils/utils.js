@@ -8,19 +8,6 @@ export const checkIsMobile = () => {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 };
 
-/**
- * 随机生成颜色
- * @returns {string} 随机生成的颜色值
- */
-export const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
 import { ElNotification, ElMessage } from 'element-plus';
 
 /**
