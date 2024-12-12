@@ -428,12 +428,12 @@ export default {
           return;
         }
       }
-      const input = document.createElement("input");
-      input.value = content;
-      document.body.appendChild(input);
-      input.select();
+      const tempTextarea = document.createElement("textarea");
+      tempTextarea.value = content;
+      document.body.appendChild(tempTextarea);
+      tempTextarea.select();
       document.execCommand("copy");
-      document.body.removeChild(input);
+      document.body.removeChild(tempTextarea);
       await axios.post("/increment_text_service_count");
       fetchTextServiceCount();
       showNotification("内容复制粘贴板！", isMobile.value, "msg");
