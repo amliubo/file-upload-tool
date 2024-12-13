@@ -130,12 +130,23 @@ def get_card_contents():
 @app.route("/save_card_content", methods=["POST"])
 def save_card_content():
     content = request.json.get("content")
+    reference='https://sdkapi-q.ggbak.com/gameCenter/enjoy?'
+    card_title=''
+    if reference in content:
+        if 'zzk4puUOWCH13TXOOb6AuOgAW4AMEjwTpyPs+B0ai/4bCNlI5c5B97Oa22f9GZTiAulLuWVOud86+EudHyYqXwkOM6JDpfxcIUxjkQLfycPJlUKOsIFo8rjmm1TwWwXg'in content:
+            card_title='h5内网主干'
+        elif 'zzk4puUOWCH13TXOOb6AuAGdxfHPoC0xoQ0j3LGo3hd4e/NQFBVhsA3+t68RAgX0AulLuWVOud86+EudHyYqXwkOM6JDpfxcIUxjkQLfycPaA8zFp3ffv+ipUlkm3LFI' in content:
+            card_title='h5内网分支'
+        elif 'zzk4puUOWCH13TXOOb6AuIz1tBvdz6TKmUV3gpn8aEitdvVXNiU4FaHWZ9cS6VgaAulLuWVOud86+EudHyYqX0/agRefqkNHNnauo+ryxS4='in content:
+            card_title='h5外网测试'
+        elif 'zzk4puUOWCH13TXOOb6AuNsd4HCujJUVR/WkOzsUWnYup61325VudEzNl2nZRKzIAulLuWVOud86+EudHyYqX1u1TpkkVZazMIKftC2i86E=' in content:
+            card_title='h5外网正式'
     counts = read_service_counts()
     card_id = counts.get("card_id", 0) + 1
     counts["card_id"] = card_id
     write_service_counts(counts)
-    app.config["cards"].insert(0, {"content": content, "card_id": card_id})
-    return jsonify({"status": 'success', "card_id": card_id, "content": content})
+    app.config["cards"].insert(0, {"content": content, "card_id": card_id,"card_title":card_title})
+    return jsonify({"status": 'success', "card_id": card_id, "content": content,"card_title":card_title})
 
 @app.route("/delete_card_content", methods=["POST"])
 def delete_card_content():

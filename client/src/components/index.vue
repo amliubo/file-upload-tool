@@ -240,6 +240,9 @@
         :key="index"
         class="custom-card"
       >
+        <div class="card-title" v-if="card.card_title">
+          <el-badge type="info" :value="card.card_title" />
+        </div>
         <div class="card-header">
           <el-badge type="warning" :value="'# ' + card.card_id" />
         </div>
@@ -478,8 +481,8 @@ export default {
         const response = await axios.post("/save_card_content", {
           content: textarea.value,
         });
-        const { card_id, content } = response.data;
-        cards.value.unshift({ content, card_id });
+        const { card_id, content, card_title } = response.data;
+        cards.value.unshift({ content, card_id, card_title });
         textarea.value = "";
         showNotification("Ding! 内容置顶！", isMobile.value, "msg");
       }
@@ -600,6 +603,12 @@ export default {
   margin-bottom: 10px;
 }
 
+.card-title {
+  position: absolute;
+  top: 1px;
+  left: 10px;
+}
+
 .card-header {
   position: absolute;
   top: 2px;
@@ -617,7 +626,6 @@ export default {
 }
 .card-buttons {
   position: absolute;
-  bottom: 10px;
   right: 10px;
   display: flex;
 }
