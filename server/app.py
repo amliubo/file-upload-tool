@@ -171,6 +171,8 @@ def get_build_date():
         "judian_dreamgp": "海外安卓",
         "judian_dreamios": "海外iOS",
         "kujian_wechatminigame": "微信小游戏",
+        "kujian_qqminigame":"QQ小游戏",
+        "kujian_qqminigame_intranet":"QQ小游戏"
     }
 
     branch_translation = {
@@ -199,6 +201,7 @@ def get_build_date():
         "Mahjong_iOS_Line2",
         "Mahjong_iOS_Line3",
         "Mahjong_WebGL_Line2",
+        "Mahjong_WebGL_Line3",
     ]
     target_hosts = [
         "10.10.243.92",
@@ -251,11 +254,17 @@ def get_build_date():
                     ).group(0)
                     os = re.search(r"\.(apk|ipa)$", package_url).group(0)
                 else:
-                    png_url = re.search(
-                        r"http://[^\s]+\.jpg", response.get("description", "")
-                    ).group(0)
+                    try:
+                        png_url = re.search(
+                            r"http://[^\s]+\.jpg", response.get("description", "")
+                        ).group(0)
+                    except:
+                        pass
                     package_url = None
-                    os = "minigame"
+                    if "qqminigame" in channel:
+                        os = "qqminigame"
+                    elif "wechatminigame" in channel:
+                        os = "wxminigame"
                 jenkins_url = re.search(
                     r"http://10\.10\.20\.45:8080/job/[^/]+/\d+/",
                     response.get("description", ""),
@@ -378,7 +387,7 @@ def get_build_date():
                         "user": user_info[target_host],
                     }
                     sorted_data.insert(0, data)
-    return sorted_data
+    return jsonify(sorted_data)
 
 
 if __name__ == "__main__":

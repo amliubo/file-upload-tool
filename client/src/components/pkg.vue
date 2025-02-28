@@ -59,8 +59,14 @@
             <svg-icon
               :className="'italic-large'"
               :color="'#007AFF'"
-              v-else-if="scope.row.os === 'minigame'"
+              v-else-if="scope.row.os === 'wxminigame'"
               iconName="iconweixinxiaochengxu"
+            />
+            <svg-icon
+              :className="'italic-large'"
+              :color="'#007AFF'"
+              v-else-if="scope.row.os === 'qqminigame'"
+              iconName="iconqqxiaochengxu-logo"
             />
             <svg-icon
               :className="'italic-large'"
@@ -278,11 +284,11 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-::v-deep .el-table th {
+:deep(.el-table th) {
   color: #ff7f7f;
 }
 
-::v-deep .el-table th .cell {
+:deep(.el-table th .cell) {
   background-color: #f0f0f0;
 }
 
