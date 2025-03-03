@@ -3,9 +3,9 @@
     <div style="flex-grow: 1; display: flex; justify-content: flex-end">
       <div class="container">
         <el-badge value="hot" class="item">
-          <el-button round @click="navigateTo"
+          <el-button type="success" @click="navigateTo"
             ><svg-icon iconName="icongongxiangzhongxin" />
-            <td>Upload Tool</td></el-button
+            <b>Upload Tool</b></el-button
           >
         </el-badge>
         <el-tag type="success" round>
@@ -165,9 +165,20 @@
             </div>
             <div
               class="operation-item"
-              v-if="['.apk', '.ipa', 'minigame'].includes(scope.row.os)"
+              v-if="
+                ['.apk', '.ipa', 'wxminigame', 'qqminigame'].includes(
+                  scope.row.os
+                )
+              "
             >
-              <el-popover placement="right" width="200" trigger="hover">
+              <el-popover
+                v-if="
+                  scope.row.os !== 'wxminigame' && scope.row.os !== 'qqminigame'
+                "
+                placement="right"
+                width="200"
+                trigger="hover"
+              >
                 <template v-slot:reference>
                   <el-button plain size="small" class="link-style"
                     ><svg-icon iconName="iconiconfontscan" class="icon-style" />
@@ -176,6 +187,17 @@
                 </template>
                 <img :src="scope.row.png_url" class="qr-code" />
               </el-popover>
+              <el-tooltip
+                v-else
+                content="小游戏QR预览时效性 暂不可用。"
+                placement="top"
+                effect="dark"
+              >
+                <el-button plain size="small" class="link-style" disabled>
+                  <svg-icon iconName="iconiconfontscan" class="icon-style" />
+                  QR
+                </el-button>
+              </el-tooltip>
             </div>
             <div
               class="operation-item"

@@ -6,8 +6,10 @@
     >
       <div class="container">
         <el-badge value="new" class="item">
-          <el-button round @click="navigateTo"
-            ><svg-icon iconName="iconquanqudao" />&nbsp;Package Tool</el-button
+          <el-button type="success" @click="navigateTo"
+            ><svg-icon iconName="iconquanqudao" />&nbsp;<b
+              >Package Tool</b
+            ></el-button
           >
         </el-badge>
         <el-descriptions>
@@ -46,23 +48,23 @@
           <div class="menu-title">
             <div v-if="filesBadgeValue > 0">
               <el-badge :value="filesBadgeValue" class="item" type="success">
-                <span style="font-size: 18px">🗂️ 文件</span>
+                <span style="font-size: 18px; font-weight: bold">🗂️ 文件</span>
               </el-badge>
             </div>
             <div v-else>
-              <span style="font-size: 18px">🗂️ 文件</span>
+              <span style="font-size: 18px; font-weight: bold">🗂️ 文件</span>
             </div>
           </div>
         </template>
-        <el-menu-item index="1-1" style="font-size: 17px">
+        <el-menu-item index="1-1" style="font-size: 17px; font-weight: bold">
           🔄组件方式
         </el-menu-item>
-        <el-menu-item index="1-2" style="font-size: 17px"
-          >非组件方式</el-menu-item
-        >
+        <el-menu-item index="1-2" style="font-size: 17px; font-weight: bold">
+          非组件方式
+        </el-menu-item>
       </el-sub-menu>
       <el-menu-item index="2">
-        <el-badge style="font-size: 18px">🗒️ 文本</el-badge>
+        <el-badge style="font-size: 18px; font-weight: bold">🗒️ 文本</el-badge>
       </el-menu-item>
     </el-menu>
     <br />
