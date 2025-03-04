@@ -396,4 +396,4 @@ if __name__ == "__main__":
     if not os.path.exists(COUNT_FILE):
         with open(COUNT_FILE, "w") as file:
             file.write("file_service_count: 0\ntext_service_count: 0\n")
-    app.run(host="10.10.243.201", port=5001)
+    app.run(host="10.10.243.201", port=5001, debug=True,use_reloader=True)
