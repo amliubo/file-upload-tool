@@ -1,11 +1,18 @@
 import os
+import pymysql
 import re
 import requests
-from datetime import datetime, timedelta
 import threading
+from datetime import datetime, timedelta
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
+from datetime import datetime
+from collections import defaultdict
+
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 UPLOAD_FOLDER = "uploads"
 COUNT_FILE = "service_counts.txt"
@@ -13,6 +20,14 @@ app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["cards"] = []
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+DB_CONFIG = {
+    "host": "10.10.240.125",
+    "user": "root",
+    "password": "root",
+    "database": "NOVA_DATA",
+    "port": 3306
+}
 
 file_upload_times = {}
 lock = threading.Lock()
@@ -388,6 +403,53 @@ def get_build_date():
                     }
                     sorted_data.insert(0, data)
     return jsonify(sorted_data)
+
+
+def get_match_statistics():
+
+    connection = pymysql.connect(**DB_CONFIG)
+    cursor = connection.cursor()
+    sql = """
+        SELECT mode, room, match_time, DATE(date) AS date
+        FROM match_results
+        WHERE date IS NOT NULL;
+    """
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    stats = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+
+    for row in results:
+        mode, room, match_time, date = row
+        if date:
+            stats[date][mode][room].append(match_time)
+
+    data = []
+    for date, modes in stats.items():
+        for mode, rooms in modes.items():
+            for room, match_times in rooms.items():
+                avg_time = round(sum(match_times) / len(match_times), 2)
+                min_time = round(min(match_times), 2)
+                max_time = round(max(match_times), 2)
+                data.append({
+                    "date": date,
+                    "mode": mode,
+                    "room": room,
+                    "match_time": match_times,
+                    "avg_time": avg_time,
+                    "min_time": min_time,
+                    "max_time": max_time
+                })
+    print(data)
+    return data
+
+
+@app.route('/match', methods=['GET'])
+def match_stats():
+    stats = get_match_statistics()
+    return jsonify({"stats": stats})
 
 
 if __name__ == "__main__":

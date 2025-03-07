@@ -6,10 +6,11 @@
     >
       <div class="container">
         <el-badge value="new" class="item">
-          <el-button type="success" @click="navigateTo"
-            ><svg-icon iconName="iconquanqudao" />&nbsp;<b
-              >Package Tool</b
-            ></el-button
+          <el-button type="primary" @click="navigateTo('/pkg')"
+            ><b>📦 Package Tool</b></el-button
+          >
+          <el-button type="primary" @click="navigateTo('/match')"
+            ><b>⏱ Mj Match</b></el-button
           >
         </el-badge>
         <el-descriptions>
@@ -338,8 +339,8 @@ export default {
     ]);
     const erwm = ref("http://10.10.25.66/resource/erweima.png");
     const router = useRouter();
-    const navigateTo = () => {
-      router.push("/pkg");
+    const navigateTo = (path) => {
+      router.push(path);
     };
 
     const detectSafariVersion = () => {

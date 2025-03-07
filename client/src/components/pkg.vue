@@ -2,13 +2,15 @@
   <div class="app">
     <div style="flex-grow: 1; display: flex; justify-content: flex-end">
       <div class="container">
-        <el-badge value="hot" class="item">
-          <el-button type="success" @click="navigateTo"
-            ><svg-icon iconName="icongongxiangzhongxin" />
-            <b>Upload Tool</b></el-button
+        <el-badge value="new" class="item">
+          <el-button type="primary" @click="navigateTo('/')">
+            <b>↕️ Upload Tool</b></el-button
+          >
+          <el-button type="primary" @click="navigateTo('/match')"
+            ><b>⏱ Mj Match</b></el-button
           >
         </el-badge>
-        <el-tag type="success" round>
+        <el-tag type="primary" round>
           <p
             style="
               font-size: 34px;
@@ -259,8 +261,8 @@ export default {
       }
     };
     const router = useRouter();
-    const navigateTo = () => {
-      router.push("/");
+    const navigateTo = (path) => {
+      router.push(path);
     };
     const handleDownload = (url) => {
       window.open(url, "_blank");
