@@ -442,7 +442,6 @@ def get_match_statistics():
                     "min_time": min_time,
                     "max_time": max_time
                 })
-    print(data)
     return data
 
 

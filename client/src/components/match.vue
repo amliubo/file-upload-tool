@@ -72,17 +72,14 @@ export default {
         const response = await axios.get("/match");
         return response.data.stats;
       } catch (error) {
-        console.error("Error fetching match stats:", error);
         return [];
       }
     };
 
     const initChart = async () => {
       const stats = await fetchMatchStats();
-      console.log("Received stats:", stats);
 
       if (!stats || !stats.length) {
-        console.error("No stats data available.");
         return;
       }
 
